@@ -24,8 +24,8 @@
 
 if(WIN32)
 SET (CHECK_FOUND 1)
-SET (CHECK_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/../windows/check)
-SET (CHECK_LIBRARIES ${PROJECT_SOURCE_DIR}/../windows/check/check.lib)
+SET (CHECK_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/windows/check)
+SET (CHECK_LIBRARIES ${PROJECT_SOURCE_DIR}/windows/check/check.lib)
 else()
 INCLUDE( FindPkgConfig )
 PKG_SEARCH_MODULE( CHECK Check )

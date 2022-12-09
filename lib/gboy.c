@@ -51,9 +51,9 @@ int gboy_run(int argc, char **argv)
             continue;
         }
 
-        if (!cpu_step()) 
+        if (!cpu_run()) 
         {
-            printf("CPU Stopped\n");
+            printf("CPU Stopped.\n");
             return -3;
         }
         ctx.ticks++;

@@ -10,8 +10,8 @@ target_include_directories(gboy PUBLIC ${PROJECT_SOURCE_DIR}/include )
 
 
 if (WIN32)
-  target_include_directories(gboy PUBLIC "${PROJECT_SOURCE_DIR}/../windows/sdl2/include" )
-  target_include_directories(gboy PUBLIC ${PROJECT_SOURCE_DIR}/../windows/sdl2_ttf/include )
+  target_include_directories(gboy PUBLIC "${PROJECT_SOURCE_DIR}/windows/sdl2/include" )
+  target_include_directories(gboy PUBLIC ${PROJECT_SOURCE_DIR}/windows/sdl2_ttf/include )
 else()
   target_include_directories(gboy PUBLIC ${SDL2_INCLUDE_DIR})
   target_link_libraries(gboy PUBLIC ${SDL2_LIBRARY}) 
