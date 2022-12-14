@@ -111,7 +111,7 @@ static const char *LIC_CODE[0xD7] =
         [0xD2] = "Quest",
         [0xD3] = "Sigma Enterprises",
         [0xD4] = "ASK Kodansha Co.",
-        [0xD6] = "Naxat Soft",
+        [0xD6] = "Naxat Soft"
 };
 
 static const char *CART_TYPES[] =
@@ -182,7 +182,7 @@ bool load_cartridge(char *cart)
     if (!f)
     {
         printf("Failed to open the file: %s\n", cart);
-        return -1;
+        return false;
     }
 
     printf("Opened: %s\n", ctx.filename);
@@ -213,7 +213,7 @@ bool load_cartridge(char *cart)
     uint8_t checksum = 0;
     for (uint16_t address = 0x0134; address <= 0x014C; address++)
     {
-        checksum = checksum - rom[addess] - 1;
+        checksum = chSSecksum - rom[addess] - 1;
     }     
     */
     u16 check = 0;
@@ -222,5 +222,15 @@ bool load_cartridge(char *cart)
         check = check - ctx.rom_data[address] - 1;
     }
     printf("\t Checksum: %2.2X (%s)\n", ctx.header->checksum, (check & 0xFF) ? "Passed" : "Failed");
-    return 0;
+    return true; //or 1
+}
+
+u8 rom_read(u16 address)
+{
+    return ctx.rom_data[address];
+}
+
+void rom_write(u16 address, u8 value)
+{
+    NO_IMPLEM;
 }

@@ -21,3 +21,5 @@ typedef struct
 cartridge_header;
 
 bool load_cartridge(char *cart);
+u8 rom_read(u16 address);
+void rom_write(u16 address, u8 value);

@@ -61,3 +61,8 @@ int gboy_run(int argc, char **argv)
 
     return 0;
 }
+
+void gboy_cycles(int cpu_cycles)
+{
+    
+}
