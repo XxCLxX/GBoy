@@ -26,7 +26,19 @@ typedef struct
     instruction *cur_instruct;
     bool halt;
     bool step;
+    bool master_interrupt_enabled;
 } cpu_context;
 
 void cpu_init();
 bool cpu_run();
+
+u16 register_read(register_type rt);
+
+typedef void (*IN_PROCESS)(cpu_context *);
+IN_PROCESS inst_get_processor(instruction_type type);
+
+//F - Flag Register
+#define FLAG_Z BIT(ctx->regs.f, 7) //Zero
+#define FLAG_S BIT(ctx->regs.f, 6) //Sub
+#define FLAG_H BIT(ctx->regs.f, 5) //Half-Carry 
+#define FLAG_C BIT(ctx->regs.f, 4) //Carry
