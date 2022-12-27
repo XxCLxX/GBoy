@@ -33,6 +33,7 @@ void cpu_init();
 bool cpu_run();
 
 u16 register_read(register_type rt);
+void register_set(register_type rt, u16 n);
 
 typedef void (*IN_PROCESS)(cpu_context *);
 IN_PROCESS inst_get_processor(instruction_type type);

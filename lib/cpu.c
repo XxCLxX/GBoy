@@ -16,50 +16,6 @@ static void fetch_instruction()
     ctx.cur_instruct = instruction_opcode(ctx.cur_opcode);
 }
 
-static void fetched_data()
-{
-    ctx.memory_dest = 0;
-    ctx.dest_is_memory = false;
-
-    if(ctx.cur_instruct == NULL)
-    {
-        return;
-    }
-
-    switch (ctx.cur_instruct->mode)
-    {
-    case AM_IMP:
-        return;
-
-    case AM_R:
-        ctx.fetch_data = register_read(ctx.cur_instruct->reg_1);
-        return;
-
-    case AM_R_D8:
-        ctx.fetch_data = bus_read(ctx.regs.pc);
-        gboy_cycles(1);
-        ctx.regs.pc++;
-        return;
-
-    case AM_D16:
-    {
-        u16 low = bus_read(ctx.regs.pc);
-        gboy_cycles(1);
-
-        u16 high = bus_read(ctx.regs.pc + 1);
-        gboy_cycles(1);
-
-        ctx.fetch_data = low | (high << 8);
-        ctx.regs.pc += 2;
-        return;
-    }
-    default:
-        printf("Unknown Address Mode %d (%02X)\n", ctx.cur_instruct->mode, ctx.cur_opcode);
-        exit(-7);
-        return;
-    }
-}
-
 static void execute()
 {
     IN_PROCESS process = inst_get_processor(ctx.cur_instruct->type);

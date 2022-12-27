@@ -1,6 +1,7 @@
 #pragma once
 #include <common.h>
 
+//Reference - GameBoy (LR35902) OPCODES
 typedef enum
 {
     AM_IMP,
