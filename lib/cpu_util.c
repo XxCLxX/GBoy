@@ -53,26 +53,33 @@ void register_set(register_type rt, u16 n)
     case RT_A:
         ctx.regs.a = n & 0xFF;
         break;
+
     case RT_F:
         ctx.regs.f = n & 0xFF;
         break;
+
     case RT_B:
         ctx.regs.b = n & 0xFF;
         break;
+
     case RT_C:
     {
-        ctx.regs.c = n & 0xff;
+        ctx.regs.c = n & 0xFF;
     }
     break;
+
     case RT_D:
         ctx.regs.d = n & 0xFF;
         break;
+
     case RT_E:
         ctx.regs.e = n & 0xFF;
         break;
+
     case RT_H:
         ctx.regs.h = n & 0xFF;
         break;
+
     case RT_L:
         ctx.regs.l = n & 0xFF;
         break;
@@ -80,23 +87,29 @@ void register_set(register_type rt, u16 n)
     case RT_AF:
         *((u16 *)&ctx.regs.a) = reverse(n);
         break;
+
     case RT_BC:
         *((u16 *)&ctx.regs.b) = reverse(n);
         break;
+
     case RT_DE:
         *((u16 *)&ctx.regs.d) = reverse(n);
         break;
+
     case RT_HL:
     {
         *((u16 *)&ctx.regs.h) = reverse(n);
         break;
     }
+
     case RT_PC:
         ctx.regs.pc = n;
         break;
+
     case RT_SP:
         ctx.regs.sp = n;
         break;
+
     case RT_NONE:
         break;
     }

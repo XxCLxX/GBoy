@@ -2,7 +2,7 @@
 #include <bus.h>
 #include <gboy.h>
 
-static cpu_context ctx;
+extern cpu_context ctx;
 
 void fetched_data()
 {
@@ -75,12 +75,14 @@ void fetched_data()
         gboy_cycles(1);
     }return;
 
+    //Loading address of the HL register then increment it.
     case AM_R_HLI:
         ctx.fetch_data = bus_read(register_read(ctx.cur_instruct->reg_2));
         gboy_cycles(1);
         register_set(RT_HL, register_read(RT_HL) + 1);
         return;
 
+    //Move register value into HL address then increment it.
     case AM_HLI_R:
         ctx.fetch_data = register_read(ctx.cur_instruct->reg_2);
         ctx.memory_dest = register_read(ctx.cur_instruct->reg_1);
@@ -88,12 +90,14 @@ void fetched_data()
         register_set(RT_HL, register_read(RT_HL) + 1);
         return;
 
+    //Loading address of the HL register then decrement it.
     case AM_R_HLD:
         ctx.fetch_data = bus_read(register_read(ctx.cur_instruct->reg_2));
         gboy_cycles(1);
         register_set(RT_HL, register_read(RT_HL) - 1);
         return;
 
+    //Move register value into HL address then decrement it.
     case AM_HLD_R:
         ctx.fetch_data = register_read(ctx.cur_instruct->reg_2);
         ctx.memory_dest = register_read(ctx.cur_instruct->reg_1);
@@ -127,7 +131,8 @@ void fetched_data()
         gboy_cycles(1);
         ctx.regs.pc++;
         return;
-
+    
+    //Moving register to a 16-bit address
     case AM_A16_R:
     case AM_D16_R:
     {

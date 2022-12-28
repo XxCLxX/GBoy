@@ -232,5 +232,6 @@ u8 rom_read(u16 address)
 
 void rom_write(u16 address, u8 value)
 {
+    printf("rom_write(%04X)\n", address);
     NO_IMPLEM;
 }
