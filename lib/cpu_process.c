@@ -41,12 +41,12 @@ static void proc_di(cpu_context *ctx)
     ctx->master_interrupt_enabled = false;
 }
 
-//Load function
-static void proc_ld(cpu_context *ctx) 
+// Load function
+static void proc_ld(cpu_context *ctx)
 {
-    if(ctx->dest_is_memory)
+    if (ctx->dest_is_memory)
     {
-        if(ctx->cur_instruct->reg_2 >= RT_AF) //if 16-bit register
+        if (ctx->cur_instruct->reg_2 >= RT_AF) // if 16-bit register
         {
             gboy_cycles(1);
             bus_write16(ctx->memory_dest, ctx->fetch_data);
@@ -58,18 +58,32 @@ static void proc_ld(cpu_context *ctx)
         return;
     }
 
-    if(ctx->cur_instruct->mode == AM_HL_SPR)
+    if (ctx->cur_instruct->mode == AM_HL_SPR)
     {
         u8 hflag = (register_read(ctx->cur_instruct->reg_2) & 0xF) + (ctx->fetch_data & 0xF) >= 0x10;
 
         u8 cflag = (register_read(ctx->cur_instruct->reg_2) & 0xFF) + (ctx->fetch_data & 0xFF) >= 0x100;
 
-        set_flags(ctx, 0 , 0, hflag, cflag);
-        register_set(ctx->cur_instruct->reg_1, register_read(ctx->cur_instruct->reg_2)+(char)ctx->fetch_data);
+        set_flags(ctx, 0, 0, hflag, cflag);
+        register_set(ctx->cur_instruct->reg_1, register_read(ctx->cur_instruct->reg_2) + (char)ctx->fetch_data);
 
         return;
     }
     register_set(ctx->cur_instruct->reg_1, ctx->fetch_data);
+}
+
+static void proc_ldh(cpu_context *ctx)
+{
+    if (ctx->cur_instruct->reg_1 == RT_A)
+    {
+        register_set(ctx->cur_instruct->reg_1, bus_read(0xFF00 | ctx->fetch_data));
+    }
+    else
+    {
+        bus_write(0xFF00 | ctx->fetch_data, ctx->regs.a);
+    }
+
+    gboy_cycles(1);
 }
 
 static void proc_xor(cpu_context *ctx)
@@ -114,6 +128,7 @@ static IN_PROCESS processors[] =
         [IN_NONE] = proc_none,
         [IN_NOP] = proc_nop,
         [IN_LD] = proc_ld,
+        [IN_LDH] = proc_ldh,
         [IN_JP] = proc_jp,
         [IN_DI] = proc_di,
         [IN_XOR] = proc_xor};

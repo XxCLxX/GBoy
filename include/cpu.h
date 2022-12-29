@@ -27,6 +27,7 @@ typedef struct
     bool halt;
     bool step;
     bool master_interrupt_enabled;
+    u8 ie_register;
 } cpu_context;
 
 void cpu_init();
@@ -34,6 +35,9 @@ bool cpu_run();
 
 u16 register_read(register_type rt);
 void register_set(register_type rt, u16 n);
+
+u8 ie_register_get();
+void ie_register_set(u8 n);
 
 typedef void (*IN_PROCESS)(cpu_context *);
 IN_PROCESS inst_get_processor(instruction_type type);

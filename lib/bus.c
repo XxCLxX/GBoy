@@ -1,6 +1,7 @@
 #include <bus.h>
 #include <ram.h>
 #include <cartridge.h>
+#include <cpu.h>
 
 // Reference the Memory Map
 u8 bus_read(u16 address)
@@ -39,12 +40,11 @@ u8 bus_read(u16 address)
     else if(address < 0xFF80) //IO Registers
     {
         printf("Unsupported memory address, bus_read(%04X)\n", address);
-        NO_IMPLEM
+        //NO_IMPLEM
     }
     else if(address == 0xFFFF) //Interrupts Enable Register
     {
-        printf("Unsupported memory address, bus_read(%04X)\n", address);
-        NO_IMPLEM
+        return ie_register_get();
     }
 
     return hram_read(address);
@@ -86,12 +86,11 @@ void bus_write(u16 address, u8 value)
     else if(address < 0xFF80) //IO Registers
     {
         printf("Unsupported memory address, bus_write(%04X)\n", address);
-        NO_IMPLEM
+        //NO_IMPLEM
     }
     else if(address == 0xFFFF) //Interrupts Enable Register
     {
-        printf("Unsupported memory address, bus_write(%04X)\n", address);
-        NO_IMPLEM
+        ie_register_set(value);
     }
     else
     {
