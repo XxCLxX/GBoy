@@ -39,9 +39,10 @@ bool cpu_run()
         fetch_instruction();
         fetched_data();
 
-        printf("%04X: %-7s (%02X %02X %02X) A: %02X B: %02X C: %02X\n", 
+        printf("%04X: %-7s (%02X %02X %02X) A: %02X BC: %02X%02X DE: %02X%02X HL: %02X%02X \n", 
         pc, instruction_name(ctx.cur_instruct->type), ctx.cur_opcode,
-        bus_read(pc + 1), bus_read(pc + 2), ctx.regs.a, ctx.regs.b, ctx.regs.c);
+        bus_read(pc + 1), bus_read(pc + 2), ctx.regs.a, ctx.regs.b, ctx.regs.c, ctx.regs.d, ctx.regs.e, ctx.regs.h, ctx.regs.l
+        );
 
         if (ctx.cur_instruct == NULL)
         {
