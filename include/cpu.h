@@ -33,6 +33,7 @@ typedef struct
 void cpu_init();
 bool cpu_run();
 
+cpu_registers *get_register();
 u16 register_read(register_type rt);
 void register_set(register_type rt, u16 n);
 

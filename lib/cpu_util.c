@@ -114,3 +114,8 @@ void register_set(register_type rt, u16 n)
         break;
     }
 }
+
+cpu_registers *get_register()
+{
+    return &ctx.regs;
+}

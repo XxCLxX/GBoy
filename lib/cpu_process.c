@@ -1,6 +1,7 @@
 #include <cpu.h>
 #include <gboy.h>
 #include <bus.h>
+#include <stack.h>
 
 // Flags: Z - S - H - C
 void set_flags(cpu_context *ctx, char z, char s, char h, char c)
@@ -123,6 +124,35 @@ static void proc_jp(cpu_context *ctx) // Jump function
     }
 }
 
+static void proc_pop(cpu_context *ctx)
+{
+    u16 low = stack_pop();
+    gboy_cycles(1);
+    u16 high = stack_pop();
+    gboy_cycles(1);
+
+    u16 n = (high << 8) | low;
+    register_set(ctx->cur_instruct->reg_1,n);
+
+    if(ctx->cur_instruct->reg_1 == RT_AF)
+    {
+        register_set(ctx->cur_instruct->reg_1, n & 0xFFF0);
+    }
+}
+
+static void proc_push(cpu_context *ctx)
+{
+    u16 high = (register_read(ctx->cur_instruct->reg_1) >> 8) & 0xFF;
+    gboy_cycles(1);
+    stack_push(high);
+
+    u16 low = register_read(ctx->cur_instruct->reg_2) & 0xFF;
+    gboy_cycles(1);
+    stack_push(low);
+
+    gboy_cycles(1);
+}
+
 static IN_PROCESS processors[] =
     {
         [IN_NONE] = proc_none,
@@ -130,6 +160,8 @@ static IN_PROCESS processors[] =
         [IN_LD] = proc_ld,
         [IN_LDH] = proc_ldh,
         [IN_JP] = proc_jp,
+        [IN_POP] = proc_pop,
+        [IN_PUSH] = proc_push,
         [IN_DI] = proc_di,
         [IN_XOR] = proc_xor};
 
