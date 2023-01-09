@@ -115,13 +115,68 @@ static bool check_condition(cpu_context *ctx)
     return false;
 }
 
-static void proc_jp(cpu_context *ctx) // Jump function
+static void goto_address(cpu_context *ctx, u16 address, bool pushpc)
 {
     if (check_condition(ctx))
     {
-        ctx->regs.pc = ctx->fetch_data;
+        if (pushpc)
+        {
+            gboy_cycles(2); // 2 because its 16 bit address
+            stack_push16(ctx->regs.pc);
+        }
+
+        ctx->regs.pc = address;
         gboy_cycles(1);
     }
+}
+
+static void proc_jp(cpu_context *ctx) // Jump function, doesn't push the pc
+{
+    goto_address(ctx, ctx->fetch_data, false);
+}
+
+static void proc_jr(cpu_context *ctx) // Jump relative function
+{
+    char rel = (char)(ctx->fetch_data & 0xFF);
+    u16 address = ctx->regs.pc + rel;
+    goto_address(ctx, address, false);
+}
+
+static void proc_call(cpu_context *ctx) // Call function, does push the pc
+{
+    goto_address(ctx, ctx->fetch_data, true);
+}
+
+static void proc_rst(cpu_context *ctx) // Restart function
+{
+    goto_address(ctx, ctx->cur_instruct->param, true);
+}
+
+static void proc_ret(cpu_context *ctx) // Return call function
+{
+    if (ctx->cur_instruct->cond != CT_NONE)
+    {
+        gboy_cycles(1);
+    }
+
+    if (check_condition(ctx))
+    {
+        u16 low = stack_pop();
+        gboy_cycles(1);
+        u16 high = stack_pop();
+        gboy_cycles(1);
+
+        u16 n = (high << 8) | low;
+        ctx->regs.pc = n;
+
+        gboy_cycles(1);
+    }
+}
+
+static void proc_reti(cpu_context *ctx)
+{
+    ctx->master_interrupt_enabled = true;
+    proc_ret(ctx);
 }
 
 static void proc_pop(cpu_context *ctx)
@@ -132,9 +187,9 @@ static void proc_pop(cpu_context *ctx)
     gboy_cycles(1);
 
     u16 n = (high << 8) | low;
-    register_set(ctx->cur_instruct->reg_1,n);
+    register_set(ctx->cur_instruct->reg_1, n);
 
-    if(ctx->cur_instruct->reg_1 == RT_AF)
+    if (ctx->cur_instruct->reg_1 == RT_AF)
     {
         register_set(ctx->cur_instruct->reg_1, n & 0xFFF0);
     }
@@ -146,7 +201,7 @@ static void proc_push(cpu_context *ctx)
     gboy_cycles(1);
     stack_push(high);
 
-    u16 low = register_read(ctx->cur_instruct->reg_2) & 0xFF;
+    u16 low = register_read(ctx->cur_instruct->reg_1) & 0xFF;
     gboy_cycles(1);
     stack_push(low);
 
@@ -159,9 +214,14 @@ static IN_PROCESS processors[] =
         [IN_NOP] = proc_nop,
         [IN_LD] = proc_ld,
         [IN_LDH] = proc_ldh,
-        [IN_JP] = proc_jp,
         [IN_POP] = proc_pop,
         [IN_PUSH] = proc_push,
+        [IN_JP] = proc_jp,
+        [IN_JR] = proc_jr,
+        [IN_CALL] = proc_call,
+        [IN_RET] = proc_ret,
+        [IN_RETI] = proc_reti,
+        [IN_RST] = proc_rst,
         [IN_DI] = proc_di,
         [IN_XOR] = proc_xor};
 
