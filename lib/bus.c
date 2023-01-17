@@ -40,7 +40,7 @@ u8 bus_read(u16 address)
     else if(address < 0xFF80) //IO Registers
     {
         printf("Unsupported memory address, bus_read(%04X)\n", address);
-        //NO_IMPLEM
+        NO_IMPLEM
     }
     else if(address == 0xFFFF) //Interrupts Enable Register
     {

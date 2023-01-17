@@ -37,6 +37,7 @@ bool cpu_run()
         u16 pc = ctx.regs.pc;
 
         fetch_instruction();
+        gboy_cycles(1);
         fetched_data();
 
         char flags[16];

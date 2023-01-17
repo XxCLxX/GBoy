@@ -37,6 +37,9 @@ cpu_registers *get_register();
 u16 register_read(register_type rt);
 void register_set(register_type rt, u16 n);
 
+u8 reg8_read(register_type rt);
+void reg8_set(register_type rt, u8 v);
+
 u8 ie_register_get();
 void ie_register_set(u8 n);
 

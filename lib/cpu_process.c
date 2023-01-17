@@ -4,7 +4,7 @@
 #include <stack.h>
 
 // Flags: Z - S - H - C
-void set_flags(cpu_context *ctx, char z, char s, char h, char c)
+void set_flags(cpu_context *ctx, int8_t z, int8_t s, int8_t h, int8_t c)
 {
     if (z != -1)
     {
@@ -37,6 +37,184 @@ static void proc_nop(cpu_context *ctx)
 {
 }
 
+register_type rt_lookup[] = {
+    RT_B,
+    RT_C,
+    RT_D,
+    RT_E,
+    RT_H,
+    RT_L,
+    RT_HL,
+    RT_A,
+};
+
+register_type decode_rt(u8 reg)
+{
+    if (reg > 0b111)
+    {
+        return RT_NONE;
+    }
+    return rt_lookup[reg];
+}
+
+static void proc_and(cpu_context *ctx)
+{
+    ctx->regs.a &= ctx->fetch_data;
+    set_flags(ctx, ctx->regs.a == 0, 0, 1, 0);
+}
+
+static void proc_or(cpu_context *ctx)
+{
+    ctx->regs.a |= ctx->fetch_data & 0xFF;
+    set_flags(ctx, ctx->regs.a == 0, 0, 0, 0);
+}
+
+static void proc_xor(cpu_context *ctx)
+{
+    ctx->regs.a ^= ctx->fetch_data & 0xFF;
+    set_flags(ctx, ctx->regs.a == 0, 0, 0, 0);
+}
+
+static void proc_cp(cpu_context *ctx)
+{
+    int n = (int)ctx->regs.a - (int)ctx->fetch_data;
+
+    set_flags(ctx, n == 0, 1, ((int)ctx->regs.a & 0x0F) - ((int)ctx->fetch_data & 0x0F) < 0, n < 0);
+}
+
+static void proc_cb(cpu_context *ctx)
+{
+    u8 op = ctx->fetch_data;
+    register_type reg = decode_rt(op & 0b111);
+    u8 bit = (op >> 3) & 0b111;
+    u8 bit_op = (op >> 6) & 0b11;
+    u8 reg_value = reg8_read(reg);
+
+    gboy_cycles(1);
+    if (reg == RT_HL)
+    {
+        gboy_cycles(2);
+    }
+
+    switch (bit_op)
+    {
+        // BIT
+    case 1:
+        set_flags(ctx, !(reg_value & (1 << bit)), 0, 1, -1);
+        return;
+
+        // RST
+    case 2:
+        reg_value &= ~(1 << bit);
+        reg8_set(reg, reg_value);
+        return;
+
+        // SET
+    case 3:
+        reg_value |= (1 << bit);
+        reg8_set(reg, reg_value);
+        return;
+    }
+
+    bool flagC = FLAG_C;
+
+    // Rotate Shift Instructions in Prefic CB
+    switch (bit)
+    {
+    // RLC
+    case 0:
+    {
+        bool setC = false;
+        u8 res = (reg_value << 1) & 0xFF;
+        if ((reg_value & (1 << 7)) != 0)
+        {
+            res |= 1;
+            setC = true;
+        }
+
+        reg8_set(reg, res);
+        set_flags(ctx, res == 0, false, false, setC);
+    }
+        return;
+
+    // RRC
+    case 1:
+    {
+        u8 old = reg_value;
+        reg_value >>= 1;
+        reg_value |= (old << 7);
+
+        reg8_set(reg, reg_value);
+        set_flags(ctx, !reg_value, false, false, old & 1);
+    }
+        return;
+
+    // RL - Rotate Left
+    case 2:
+    {
+        u8 old = reg_value;
+        reg_value <<= 1;
+        reg_value |= flagC;
+
+        reg8_set(reg, reg_value);
+        set_flags(ctx, !reg_value, false, false, !!(old & 0x80));
+    }
+        return;
+
+    // RR - Rotate Right
+    case 3:
+    {
+        u8 old = reg_value;
+        reg_value >>= 1;
+        reg_value |= (flagC << 7);
+
+        reg8_set(reg, reg_value);
+        set_flags(ctx, !reg_value, false, false, old & 1);
+    }
+        return;
+
+    // SLA
+    case 4:
+    {
+        u8 old = reg_value;
+        reg_value <<= 1;
+
+        reg8_set(reg, reg_value);
+        set_flags(ctx, !reg_value, false, false, !!(old & 0x80));
+    }
+        return;
+
+    // SRA
+    case 5:
+    {
+        u8 u = (int8_t)reg_value >> 1;
+        reg8_set(reg, u);
+        set_flags(ctx, !u, 0, 0, reg_value & 1);
+    }
+        return;
+
+    // SWAP
+    case 6:
+    {
+        reg_value = ((reg_value & 0xF0) >> 4) | ((reg_value & 0xF) << 4);
+        reg8_set(reg, reg_value);
+        set_flags(ctx, reg_value == 0, false, false, false);
+    }
+        return;
+
+    // SRL
+    case 7:
+    {
+        u8 u = reg_value >> 1;
+        reg8_set(reg, u);
+        set_flags(ctx, !u, 0, 0, reg_value & 1);
+    }
+        return;
+    }
+    fprintf(stderr, "ERROR: Invalid CB: %02X", op);
+    NO_IMPLEM
+}
+
 static void proc_di(cpu_context *ctx)
 {
     ctx->master_interrupt_enabled = false;
@@ -61,6 +239,7 @@ static void proc_ld(cpu_context *ctx)
         {
             bus_write(ctx->memory_dest, ctx->fetch_data);
         }
+        gboy_cycles(1);
         return;
     }
 
@@ -71,7 +250,7 @@ static void proc_ld(cpu_context *ctx)
         u8 cflag = (register_read(ctx->cur_instruct->reg_2) & 0xFF) + (ctx->fetch_data & 0xFF) >= 0x100;
 
         set_flags(ctx, 0, 0, hflag, cflag);
-        register_set(ctx->cur_instruct->reg_1, register_read(ctx->cur_instruct->reg_2) + (char)ctx->fetch_data);
+        register_set(ctx->cur_instruct->reg_1, register_read(ctx->cur_instruct->reg_2) + (int8_t)ctx->fetch_data);
 
         return;
     }
@@ -92,13 +271,7 @@ static void proc_ldh(cpu_context *ctx)
     gboy_cycles(1);
 }
 
-static void proc_xor(cpu_context *ctx)
-{
-    ctx->regs.a ^= ctx->fetch_data & 0xFF;
-    set_flags(ctx, ctx->regs.a == 0, 0, 0, 0);
-}
-
-// conditional jump if nz,z,nc,c
+// Conditional jump if nz,z,nc,c
 static bool check_condition(cpu_context *ctx)
 {
     bool z = FLAG_Z;
@@ -144,7 +317,7 @@ static void proc_jp(cpu_context *ctx)
 // Jump relative function
 static void proc_jr(cpu_context *ctx)
 {
-    char rel = (char)(ctx->fetch_data & 0xFF);
+    int8_t rel = (int8_t)(ctx->fetch_data & 0xFF);
     u16 address = ctx->regs.pc + rel;
     goto_address(ctx, address, false);
 }
@@ -291,7 +464,7 @@ static void proc_add(cpu_context *ctx)
 
     if (ctx->cur_instruct->reg_1 == RT_SP)
     {
-        v = register_read(ctx->cur_instruct->reg_1) + (char)ctx->fetch_data;
+        v = register_read(ctx->cur_instruct->reg_1) + (int8_t)ctx->fetch_data;
     }
 
     int z = (v & 0xFF) == 0;
@@ -378,7 +551,12 @@ static IN_PROCESS processors[] =
         [IN_SUB] = proc_sub,
         [IN_SBC] = proc_sbc,
         [IN_DI] = proc_di,
-        [IN_XOR] = proc_xor};
+        [IN_XOR] = proc_xor,
+        [IN_AND] = proc_and,
+        [IN_OR] = proc_or,
+        [IN_CP] = proc_cp,
+        [IN_CB] = proc_cb,
+};
 
 IN_PROCESS inst_get_processor(instruction_type type)
 {
