@@ -27,6 +27,7 @@ typedef struct
     bool halt;
     bool step;
     bool master_interrupt_enabled;
+    bool enabling_mie;
     u8 ie_register;
 } cpu_context;
 

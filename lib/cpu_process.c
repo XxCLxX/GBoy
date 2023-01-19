@@ -215,9 +215,103 @@ static void proc_cb(cpu_context *ctx)
     NO_IMPLEM
 }
 
+// General-Purpose Arthermetic operations & CPU Control Instructions
+static void proc_stop(cpu_context *ctx)
+{
+    fprintf(stderr, "STOP\n");
+    NO_IMPLEM
+}
+
+static void proc_daa(cpu_context *ctx)
+{
+    u8 u = 0;
+    int flagC = 0;
+
+    if (FLAG_H || (!FLAG_S && (ctx->regs.a & 0xF) > 9))
+    {
+        u = 6;
+    }
+
+    if (FLAG_C || (!FLAG_S && ctx->regs.a > 0x99))
+    {
+        u |= 0x60;
+        flagC = 1;
+    }
+
+    ctx->regs.a += FLAG_S ? -u : u;
+    set_flags(ctx, ctx->regs.a == 0, -1, 0, flagC);
+}
+
+static void proc_cpl(cpu_context *ctx)
+{
+    ctx->regs.a = ~ctx->regs.a;
+    set_flags(ctx, -1, 1, 1, -1);
+}
+
+static void proc_scf(cpu_context *ctx)
+{
+    set_flags(ctx, -1, 0, 0, 1);
+}
+
+static void proc_ccf(cpu_context *ctx)
+{
+    set_flags(ctx, -1, 0, 0, FLAG_C ^ 1);
+}
+
+// Rotate Shift Instructions
+static void proc_rla(cpu_context *ctx)
+{
+    u8 u = ctx->regs.a;
+    u8 flagC = FLAG_C;
+    u8 c = (u >> 7) & 1;
+
+    ctx->regs.a = (u << 1) | flagC;
+    set_flags(ctx, 0, 0, 0, c);
+}
+
+static void proc_rra(cpu_context *ctx)
+{
+    u8 carry = FLAG_C;
+    u8 c = ctx->regs.a & 1;
+
+    ctx->regs.a >>= 1;
+    ctx->regs.a |= (carry << 7);
+
+    set_flags(ctx, 0, 0, 0, c);
+}
+
+static void proc_rlca(cpu_context *ctx)
+{
+    u8 u = ctx->regs.a;
+    bool flagC = (u >> 7) & 1;
+    u = (u << 1) | flagC;
+    ctx->regs.a = u;
+
+    set_flags(ctx, 0, 0, 0, flagC);
+}
+
+static void proc_rrca(cpu_context *ctx)
+{
+    u8 c = ctx->regs.a & 1;
+    ctx->regs.a >>= 1;
+    ctx->regs.a |= (c << 7);
+
+    set_flags(ctx, 0, 0, 0, c);
+}
+
+static void proc_halt(cpu_context *ctx)
+{
+    ctx->halt = true;
+}
+
 static void proc_di(cpu_context *ctx)
 {
     ctx->master_interrupt_enabled = false;
+}
+
+static void proc_ei(cpu_context *ctx)
+{
+    ctx->enabling_mie = true;
 }
 
 static bool is_16bit(register_type rt)
@@ -556,7 +650,17 @@ static IN_PROCESS processors[] =
         [IN_OR] = proc_or,
         [IN_CP] = proc_cp,
         [IN_CB] = proc_cb,
-};
+        [IN_RRA] = proc_rra,
+        [IN_RLA] = proc_rla,
+        [IN_RRCA] = proc_rrca,
+        [IN_RLCA] = proc_rlca,
+        [IN_STOP] = proc_stop,
+        [IN_HALT] = proc_halt,
+        [IN_DAA] = proc_daa,
+        [IN_CPL] = proc_cpl,
+        [IN_SCF] = proc_scf,
+        [IN_CCF] = proc_ccf,
+        [IN_EI] = proc_ei};
 
 IN_PROCESS inst_get_processor(instruction_type type)
 {

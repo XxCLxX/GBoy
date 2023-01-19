@@ -30,7 +30,8 @@ u8 bus_read(u16 address)
     else if(address < 0xFEA0) //OAM
     {
         printf("Unsupported memory address, bus_read(%04X)\n", address);
-        NO_IMPLEM
+        //NO_IMPLEM
+        return 0x0;
     } 
     else if(address < 0xFF00) //Not Usable
     {
@@ -40,7 +41,8 @@ u8 bus_read(u16 address)
     else if(address < 0xFF80) //IO Registers
     {
         printf("Unsupported memory address, bus_read(%04X)\n", address);
-        NO_IMPLEM
+        //NO_IMPLEM
+        return 0x0;
     }
     else if(address == 0xFFFF) //Interrupts Enable Register
     {
@@ -60,7 +62,7 @@ void bus_write(u16 address, u8 value)
     else if(address < 0xA000)
     {
         printf("Unsupported memory address, bus_write(%04X)\n", address);
-        NO_IMPLEM
+        //NO_IMPLEM
     }
     else if(address < 0xC000) //External RAM
     {
@@ -77,7 +79,7 @@ void bus_write(u16 address, u8 value)
     else if(address < 0xFEA0) //OAM
     {
         printf("Unsupported memory address, bus_write(%04X)\n", address);
-        NO_IMPLEM
+        //NO_IMPLEM
     }
     else if(address < 0xFF00) //Not Usable
     {
