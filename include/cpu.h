@@ -24,11 +24,14 @@ typedef struct
     bool dest_is_memory;
     u8 cur_opcode;
     instruction *cur_instruct;
+
     bool halt;
     bool step;
+
     bool master_interrupt_enabled;
     bool enabling_mie;
     u8 ie_register;
+    u8 interrupt_flag;
 } cpu_context;
 
 void cpu_init();
@@ -43,6 +46,9 @@ void reg8_set(register_type rt, u8 v);
 
 u8 ie_register_get();
 void ie_register_set(u8 n);
+
+u8 interrupt_flag_get();
+void interrupt_flag_set(u8 n);
 
 typedef void (*IN_PROCESS)(cpu_context *);
 IN_PROCESS inst_get_processor(instruction_type type);

@@ -35,7 +35,7 @@ u8 bus_read(u16 address)
     } 
     else if(address < 0xFF00) //Not Usable
     {
-        printf("Unsupported memory address, bus_read(%04X)\n", address);
+        //printf("Unsupported memory address, bus_read(%04X)\n", address);
         return 0;
     }
     else if(address < 0xFF80) //IO Registers

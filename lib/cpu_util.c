@@ -204,3 +204,13 @@ cpu_registers *get_register()
 {
     return &ctx.regs;
 }
+
+u8 interrupt_flag_get()
+{
+    return ctx.interrupt_flag;
+}
+
+void interrupt_flag_set(u8 n)
+{
+    ctx.interrupt_flag = n;
+}

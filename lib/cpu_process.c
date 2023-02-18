@@ -660,7 +660,8 @@ static IN_PROCESS processors[] =
         [IN_CPL] = proc_cpl,
         [IN_SCF] = proc_scf,
         [IN_CCF] = proc_ccf,
-        [IN_EI] = proc_ei};
+        [IN_EI] = proc_ei
+        };
 
 IN_PROCESS inst_get_processor(instruction_type type)
 {

@@ -5,6 +5,7 @@ typedef struct
 {
     bool paused;
     bool running;
+    bool close;
     u64 ticks;
 } gboy_context;
 

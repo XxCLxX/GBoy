@@ -1,6 +1,7 @@
 #include <cpu.h>
 #include <bus.h>
 #include <gboy.h>
+#include <interrupt.h>
 
 cpu_context ctx = {0};
 
@@ -57,7 +58,28 @@ bool cpu_run()
             exit(-7);
         }
         execute();
+    } 
+    else
+    {
+        gboy_cycles(1);
+
+        if(ctx.interrupt_flag)
+        {
+            ctx.halt = false;
+        }
     }
+
+    if(ctx.master_interrupt_enabled)
+    {
+        cpu_interrupt_handler(&ctx);
+        ctx.enabling_mie = false;
+    }
+
+    if(ctx.enabling_mie)
+    {
+        ctx.master_interrupt_enabled = true;
+    }
+
     // return false;
     return true;
 }
