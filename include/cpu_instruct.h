@@ -2,6 +2,7 @@
 #include <common.h>
 
 // Reference - GameBoy (LR35902) OPCODES
+// Addressing mode
 typedef enum
 {
     AM_IMP,
@@ -27,6 +28,7 @@ typedef enum
     AM_R_A16
 } address_mode;
 
+// Registers
 typedef enum
 {
     RT_NONE,
@@ -46,6 +48,7 @@ typedef enum
     RT_PC
 } register_type;
 
+// Instructions
 typedef enum
 {
     IN_NONE,
@@ -98,6 +101,11 @@ typedef enum
     IN_SET
 } instruction_type;
 
+/*Flag condtions
+Z - Zero Flag
+N - Subtract Flag
+H - Half Carry Flag
+C - Carry Flag */
 typedef enum
 {
     CT_NONE,

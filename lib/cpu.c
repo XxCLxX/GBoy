@@ -48,8 +48,11 @@ bool cpu_run()
                 ctx.regs.f & (1 << 5) ? 'H' : '-',
                 ctx.regs.f & (1 << 4) ? 'C' : '-');
 
-        printf("%08lX - %04X: %-7s (%02X %02X %02X) A: %02X F: %s BC: %02X%02X DE: %02X%02X HL: %02X%02X \n", gboy_get_context()->ticks,
-               pc, instruction_name(ctx.cur_instruct->type), ctx.cur_opcode,
+        char opcode[16];
+        disassemble(&ctx, opcode);
+
+        printf("%08lX - %04X: %-12s (%02X %02X %02X) A: %02X F: %s BC: %02X%02X DE: %02X%02X HL: %02X%02X \n", gboy_get_context()->ticks,
+               pc, opcode, ctx.cur_opcode,
                bus_read(pc + 1), bus_read(pc + 2), ctx.regs.a, flags, ctx.regs.b, ctx.regs.c, ctx.regs.d, ctx.regs.e, ctx.regs.h, ctx.regs.l);
 
         if (ctx.cur_instruct == NULL)

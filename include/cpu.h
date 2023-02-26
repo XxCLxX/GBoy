@@ -53,6 +53,8 @@ void interrupt_flag_set(u8 n);
 typedef void (*IN_PROCESS)(cpu_context *);
 IN_PROCESS inst_get_processor(instruction_type type);
 
+void disassemble(cpu_context *ctx, char *str);
+
 //F - Flag Register
 #define FLAG_Z BIT(ctx->regs.f, 7) //Zero
 #define FLAG_S BIT(ctx->regs.f, 6) //Sub
