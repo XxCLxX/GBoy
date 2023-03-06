@@ -2,7 +2,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 find_package(Check REQUIRED)
 include_directories(${CHECK_INCLUDE_DIRS})
-include_directories("/usr/local/include")
+#include_directories("/usr/local/include")
 link_directories(${CHECK_LIBRARY_DIRS})
 
 set(TEST_SOURCES

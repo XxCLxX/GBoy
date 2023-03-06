@@ -3,13 +3,24 @@
 #include <gboy.h>
 #include <interrupt.h>
 #include <debugger.h>
+#include <timer.h>
 
 cpu_context ctx = {0};
 
 void cpu_init()
 {
     ctx.regs.pc = 0x100;
-    ctx.regs.a = 0x01;
+    ctx.regs.sp = 0xFFFE;
+    *((short *)&ctx.regs.a) = 0xB001;
+    *((short *)&ctx.regs.b) = 0x1300;
+    *((short *)&ctx.regs.d) = 0xD800;
+    *((short *)&ctx.regs.h) = 0x4D01;
+    ctx.ie_register = 0;
+    ctx.interrupt_flag = 0;
+    ctx.master_interrupt_enabled = false;
+    ctx.enabling_mie = false;
+
+    get_timer_ctx()->div = 0xABCC;
 }
 
 static void fetch_instruction()
@@ -63,7 +74,7 @@ bool cpu_run()
         }
         debugger_update();
         debugger_print();
-        
+
         execute();
     }
     else
@@ -99,4 +110,9 @@ u8 ie_register_get()
 void ie_register_set(u8 n)
 {
     ctx.ie_register = n;
+}
+
+void request_interrupt(interrupt_type t)
+{
+    ctx.interrupt_flag |= t;
 }

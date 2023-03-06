@@ -22,10 +22,7 @@ bool interrupt_check(cpu_context *ctx, u16 address, interrupt_type t)
     return false;
 }
 
-void cpu_interrupt_request(interrupt_type t)
-{
-
-}
+void cpu_interrupt_request(interrupt_type t);
 
 void cpu_interrupt_handler(cpu_context *ctx)
 {

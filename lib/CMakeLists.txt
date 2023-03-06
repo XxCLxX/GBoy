@@ -21,4 +21,6 @@ endif()
 include_directories("/usr/local/include")
 include_directories(${SDL2_INCLUDE_DIRS})
 target_link_libraries(gboy ${SDL2_LIBRARIES})
+
+include_directories(${SDL2_TTF_INCLUDE_DIRS})
 target_link_libraries(gboy ${SDL2_TTF_LIBRARIES})

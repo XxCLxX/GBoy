@@ -577,7 +577,7 @@ static void proc_add(cpu_context *ctx)
     {
         z = 0;
         h = (register_read(ctx->cur_instruct->reg_1) & 0xF) + (ctx->fetch_data & 0xF) >= 0x10;
-        c = (int)(register_read(ctx->cur_instruct->reg_1) & 0xFF) + (int)(ctx->fetch_data & 0xFF) > 0x100;
+        c = (int)(register_read(ctx->cur_instruct->reg_1) & 0xFF) + (int)(ctx->fetch_data & 0xFF) >= 0x100;
     }
 
     register_set(ctx->cur_instruct->reg_1, v & 0xFFFF);

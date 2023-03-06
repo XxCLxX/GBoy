@@ -2,6 +2,7 @@
 #include <cpu.h>
 
 //Interrupt Controller
+//Interupt Flags
 typedef enum
 {
     IF_Joypad = 16,  //0x60
