@@ -1,6 +1,6 @@
 project(src C)
 
-cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
+cmake_minimum_required(VERSION 2.9 FATAL_ERROR)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 ###############################################################################
@@ -88,5 +88,7 @@ set(CONFIG_HEADER ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 # Subdirectories
 add_subdirectory(lib)
 add_subdirectory(src)
-
+add_subdirectory(test)
 ###############################################################################
+enable_testing()
+add_test(NAME test_gboy COMMAND test_gboy)

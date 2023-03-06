@@ -2,6 +2,7 @@
 #include <bus.h>
 #include <gboy.h>
 #include <interrupt.h>
+#include <debugger.h>
 
 cpu_context ctx = {0};
 
@@ -60,25 +61,28 @@ bool cpu_run()
             printf("Unknown Instruction %02X\n", ctx.cur_opcode);
             exit(-7);
         }
+        debugger_update();
+        debugger_print();
+        
         execute();
-    } 
+    }
     else
     {
         gboy_cycles(1);
 
-        if(ctx.interrupt_flag)
+        if (ctx.interrupt_flag)
         {
             ctx.halt = false;
         }
     }
 
-    if(ctx.master_interrupt_enabled)
+    if (ctx.master_interrupt_enabled)
     {
         cpu_interrupt_handler(&ctx);
         ctx.enabling_mie = false;
     }
 
-    if(ctx.enabling_mie)
+    if (ctx.enabling_mie)
     {
         ctx.master_interrupt_enabled = true;
     }
