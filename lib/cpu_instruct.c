@@ -1,6 +1,6 @@
 #include <cpu.h>
 #include <cpu_instruct.h>
-//#include <bus.h>
+#include <bus.h>
 
 instruction instructions[0x100] =
     {

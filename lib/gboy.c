@@ -36,7 +36,7 @@ void *cpu_running(void *p)
             printf("CPU Stopped...\n");
             return 0;
         }
-        //ctx.ticks++;
+        // ctx.ticks++;
     }
     return 0;
 }
@@ -70,6 +70,7 @@ int gboy_run(int argc, char **argv)
     {
         usleep(1000);
         interface_handle_events();
+        interface_update();
     }
     return 0;
 }
@@ -78,7 +79,7 @@ void gboy_cycles(int cpu_cycles)
 {
     int n = cpu_cycles * 4;
 
-    for(int i=0; i<n; i++)
+    for (int i = 0; i < n; i++)
     {
         ctx.ticks++;
         timer_tick();

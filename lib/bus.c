@@ -3,6 +3,7 @@
 #include <cartridge.h>
 #include <cpu.h>
 #include <io.h>
+#include <ppu.h>
 
 // Reference the Memory Map
 u8 bus_read(u16 address)
@@ -13,8 +14,7 @@ u8 bus_read(u16 address)
     }
     else if(address < 0xA000) //VRAM
     {
-        printf("Unsupported memory address, bus_read(%04X)\n", address);
-        NO_IMPLEM
+        return vram_read(address);
     }
     else if(address < 0xC000) //External RAM
     {
@@ -30,9 +30,7 @@ u8 bus_read(u16 address)
     }
     else if(address < 0xFEA0) //OAM
     {
-        printf("Unsupported memory address, bus_read(%04X)\n", address);
-        //NO_IMPLEM
-        return 0x0;
+        return oam_read(address);
     } 
     else if(address < 0xFF00) //Not Usable
     {
@@ -58,10 +56,9 @@ void bus_write(u16 address, u8 value)
     {
         rom_write(address, value);
     }
-    else if(address < 0xA000)
+    else if(address < 0xA000) //VRAM
     {
-        printf("Unsupported memory address, bus_write(%04X)\n", address);
-        //NO_IMPLEM
+        vram_write(address, value);
     }
     else if(address < 0xC000) //External RAM
     {
@@ -77,8 +74,7 @@ void bus_write(u16 address, u8 value)
     }
     else if(address < 0xFEA0) //OAM
     {
-        printf("Unsupported memory address, bus_write(%04X)\n", address);
-        //NO_IMPLEM
+        oam_write(address, value);
     }
     else if(address < 0xFF00) //Not Usable
     {
