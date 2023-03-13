@@ -47,7 +47,7 @@ void timer_tick()
         if (ctx.tima == 0xFF)
         {
             ctx.tima = ctx.tma;
-            cpu_interrupt_request(IF_Timer);
+            request_interrupt(IF_Timer);
         }
     }
 }

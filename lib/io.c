@@ -43,7 +43,8 @@ void io_write(u16 address, u8 value)
 
     if(BETWEEN(address, 0xFF04, 0xFF07))
     {
-        return timer_write(address, value);
+        timer_write(address, value);
+        return;
     }
     if(address == 0xFF0F)
     {

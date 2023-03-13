@@ -12,6 +12,6 @@ typedef enum
     IF_VBlank = 1    //0x40
 }interrupt_type;
 
-void cpu_interrupt_request(interrupt_type t);
+void request_interrupt(interrupt_type t);
 
 void cpu_interrupt_handler(cpu_context *ctx);
