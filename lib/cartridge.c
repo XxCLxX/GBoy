@@ -13,7 +13,7 @@ static cart_context ctx;
 // Reference from Pan Docs
 static const char *LIC_CODE[0xD7] =
     {
-        [0x00] = "None",            //New licensee code
+        [0x00] = "None", // New licensee code
         [0x01] = "Nintendo R&D1",
         [0x08] = "Capcom",
         [0x13] = "Electronic Arts",
@@ -74,7 +74,7 @@ static const char *LIC_CODE[0xD7] =
         [0x97] = "Kaneko",
         [0x99] = "Pack-In-Soft",
         [0xA4] = "Konami (Yu-Gi-Oh!)",
-        [0xA6] = "Kawada",               //Old licensee
+        [0xA6] = "Kawada", // Old licensee
         [0xA7] = "Takara",
         [0xA9] = "Technos Japan",
         [0xAA] = "Broderbund",
@@ -94,11 +94,11 @@ static const char *LIC_CODE[0xD7] =
         [0xBF] = "Sammy",
         [0xC0] = "Taito",
         [0xC2] = "Kemco",
-        [0xC3] = "SquareSoft",   
+        [0xC3] = "SquareSoft",
         [0xC4] = "Tokuma Shoten Intermedia",
         [0xC5] = "Data East",
         [0xC6] = "Tonkinhouse",
-        [0xC8] = "Koei",     
+        [0xC8] = "Koei",
         [0xC9] = "UFL",
         [0xCA] = "Ultra",
         [0xCB] = "Vap",
@@ -111,8 +111,7 @@ static const char *LIC_CODE[0xD7] =
         [0xD2] = "Quest",
         [0xD3] = "Sigma Enterprises",
         [0xD4] = "ASK Kodansha Co.",
-        [0xD6] = "Naxat Soft"
-};
+        [0xD6] = "Naxat Soft"};
 
 static const char *CART_TYPES[] =
     {
@@ -214,7 +213,7 @@ bool load_cartridge(char *cart)
     for (uint16_t address = 0x0134; address <= 0x014C; address++)
     {
         checksum = chSSecksum - rom[addess] - 1;
-    }     
+    }
     */
     u16 check = 0;
     for (u16 address = 0x0134; address <= 0x014C; address++)
@@ -222,7 +221,7 @@ bool load_cartridge(char *cart)
         check = check - ctx.rom_data[address] - 1;
     }
     printf("\t Checksum: %2.2X (%s)\n", ctx.header->checksum, (check & 0xFF) ? "Passed" : "Failed");
-    return true; //or 1
+    return true; // or 1
 }
 
 u8 rom_read(u16 address)
@@ -233,5 +232,5 @@ u8 rom_read(u16 address)
 void rom_write(u16 address, u8 value)
 {
     printf("rom_write(%04X)\n", address);
-    NO_IMPLEM;
+    // NO_IMPLEM;
 }

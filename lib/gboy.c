@@ -6,6 +6,7 @@
 #include <pthread.h>
 #include <unistd.h>
 #include <timer.h>
+#include <dma.h>
 
 static gboy_context ctx;
 gboy_context *gboy_get_context()
@@ -77,11 +78,13 @@ int gboy_run(int argc, char **argv)
 
 void gboy_cycles(int cpu_cycles)
 {
-    int n = cpu_cycles * 4;
-
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < cpu_cycles; i++)
     {
-        ctx.ticks++;
-        timer_tick();
+        for (int n = 0; n < 4; n++)
+        {
+            ctx.ticks++;
+            timer_tick();
+        }
+        dma_tick();
     }
 }

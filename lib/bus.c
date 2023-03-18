@@ -4,6 +4,7 @@
 #include <cpu.h>
 #include <io.h>
 #include <ppu.h>
+#include <dma.h>
 
 // Reference the Memory Map
 u8 bus_read(u16 address)
@@ -30,6 +31,10 @@ u8 bus_read(u16 address)
     }
     else if(address < 0xFEA0) //OAM
     {
+        if(dma_transfer())
+        {
+            return 0xFF;
+        }
         return oam_read(address);
     } 
     else if(address < 0xFF00) //Not Usable
@@ -74,6 +79,10 @@ void bus_write(u16 address, u8 value)
     }
     else if(address < 0xFEA0) //OAM
     {
+        if(dma_transfer())
+        {
+            return;
+        }
         oam_write(address, value);
     }
     else if(address < 0xFF00) //Not Usable

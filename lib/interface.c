@@ -35,13 +35,13 @@ void interface_init()
                                            0x000000FF,
                                            0xFF000000);
 
-    sdlDebugTexture = SDL_CreateTexture(sdlDebugRenderer, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_STREAMING,
+    sdlDebugTexture = SDL_CreateTexture(sdlDebugRenderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING,
                                         (16 * 8 * scale) + (16 * scale),
                                         (32 * 8 * scale) + (64 * scale));
 
     int x, y;
     SDL_GetWindowPosition(sdlWindow, &x, &y);
-    SDL_GetWindowPosition(sdlDebugWindow, x + SCREEN_WIDTH + 10, y);
+    SDL_SetWindowPosition(sdlDebugWindow, x + SCREEN_WIDTH + 10, y);
 }
 
 void delay(u32 ms)
@@ -49,7 +49,7 @@ void delay(u32 ms)
     SDL_Delay(ms);
 }
 
-static unsigned long colour_palette[4] = {0xFFFFFFFF, 0xFFAAAAAAA, 0xFF555555, 0xFF000000};
+static unsigned long colour_palette[4] = {0xFFFFFFFF, 0xFFAAAAAA, 0xFF555555, 0xFF000000};
 
 void displayTile(SDL_Surface *surface, u16 start_loc, u16 tileNum, int x, int y)
 {
@@ -77,7 +77,7 @@ void displayTile(SDL_Surface *surface, u16 start_loc, u16 tileNum, int x, int y)
     }
 }
 
-updateDebugWindow()
+void updateDebugWindow()
 {
     int x_draw = 0;
     int y_draw = 0;
@@ -88,7 +88,7 @@ updateDebugWindow()
     rec.y = 0;
     rec.w = sdlDebugSurface->w;
     rec.h = sdlDebugSurface->h;
-    SDL_FillRect(sdlDebugWindow, &rec, 0xFF111111);
+    SDL_FillRect(sdlDebugSurface, &rec, 0xFF111111);
 
     u16 address = 0x8000;
 
@@ -120,7 +120,6 @@ void interface_handle_events()
     SDL_Event e;
     while (SDL_PollEvent(&e) > 0)
     {
-
         if (e.type == SDL_WINDOWEVENT && e.window.event == SDL_WINDOWEVENT_CLOSE)
         {
             gboy_get_context()->close = true;
