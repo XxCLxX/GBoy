@@ -19,3 +19,4 @@ typedef uint64_t u64;
     }
 
 void delay(u32 ms);
+u32 get_ticks();

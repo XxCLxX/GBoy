@@ -1,13 +1,50 @@
 #include <ppu.h>
+#include <lcd.h>
+#include <string.h>
+#include <ppu_state_machine.h>
 
 static ppu_context ctx;
 
+ppu_context *get_ppu_context()
+{
+    return &ctx;
+}
+
 void ppu_init()
 {
+    ctx.current_frame = 0;
+    ctx.line_ticks = 0;
+    ctx.video_buffer = malloc(Y_RES * X_RES * sizeof(32));
+
+    lcd_init();
+    LCDS_MODE_SET(MODE_OAM);
+
+    memset(ctx.oam_ram, 0, sizeof(ctx.oam_ram));
+    memset(ctx.video_buffer, 0, Y_RES * X_RES * sizeof(u32));
 }
 
 void ppu_run()
 {
+    ctx.line_ticks++;
+
+    switch (LCDS_MODE)
+    {
+        case MODE_OAM:
+            state_mode_oam();
+            break;
+
+        case MODE_DRAW:
+            state_mode_draw();
+            break;
+
+        case MODE_VBLANK:
+            state_mode_vblank();
+            break;
+
+        case MODE_HBLANK:
+            state_mode_hblank();
+            break;
+    }
 }
 
 void oam_write(u16 address, u8 value)

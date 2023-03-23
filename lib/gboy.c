@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <timer.h>
 #include <dma.h>
+#include <ppu.h>
 
 static gboy_context ctx;
 gboy_context *gboy_get_context()
@@ -18,6 +19,7 @@ void *cpu_running(void *p)
 {
     timer_init();
     cpu_init();
+    ppu_init();
 
     ctx.running = true;
     ctx.paused = false;
@@ -67,11 +69,19 @@ int gboy_run(int argc, char **argv)
         fprintf(stderr, "CPU Thread: Failed\n");
         return -1;
     }
+
+    u32 prev_frame = 0;
+
     while (!ctx.close)
     {
         usleep(1000);
         interface_handle_events();
-        interface_update();
+
+        if (prev_frame != get_ppu_context()->current_frame)
+        {
+            interface_update();
+        }
+        prev_frame = get_ppu_context()->current_frame;
     }
     return 0;
 }
@@ -84,6 +94,7 @@ void gboy_cycles(int cpu_cycles)
         {
             ctx.ticks++;
             timer_tick();
+            ppu_run();
         }
         dma_tick();
     }

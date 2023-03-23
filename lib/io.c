@@ -2,10 +2,10 @@
 #include <timer.h>
 #include <cpu.h>
 #include <dma.h>
+#include <lcd.h>
 // https://gbdev.io/pandocs/Serial_Data_Transfer_(Link_Cable).html
 
 static char serial_data[2];
-u8 temp_ly = 0;
 
 u8 io_read(u16 address)
 {
@@ -22,14 +22,15 @@ u8 io_read(u16 address)
     {
         return timer_read(address);
     }
+
     if (address == 0xFF0F)
     {
         return get_interrupt_flags();
     }
 
-    if (address == 0xFF0F)
+    if (BETWEEN(address, 0xFF40, 0xFF4B))
     {
-         return temp_ly++;
+        return lcd_read(address);
     }
 
     printf("Unsupported memory address, bus_read(%04X)\n", address);
@@ -54,16 +55,17 @@ void io_write(u16 address, u8 value)
         timer_write(address, value);
         return;
     }
+
     if (address == 0xFF0F)
     {
         set_interrupt_flags(value);
         return;
     }
 
-    if (address == 0xFF46)
+    if (BETWEEN(address, 0xFF40, 0xFF4B))
     {
-        dma_start_address(value);
-        printf("Start DMA\n");
+        lcd_write(address, value);
+        return;
     }
 
     printf("Unsupported memory address, bus_write(%04X)\n", address);

@@ -36,13 +36,8 @@ void dma_tick()
     oam_write(ctx.byte, bus_read((ctx.value * 0x100) + ctx.byte));
     ctx.byte++;
     ctx.active = ctx.byte < 0xA0;
-
-    if(!ctx.active)
-    {
-        printf("DMA Done\n");
-        sleep(2);
-    }
 }
+
 bool dma_transfer()
 {
     return ctx.active;
