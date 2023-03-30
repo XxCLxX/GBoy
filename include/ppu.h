@@ -7,6 +7,44 @@ static const int DOTS_PER_LINE = 456;
 static const int Y_RES = 144;
 static const int X_RES = 160;
 
+// Pixel FIFO -State Machine
+typedef enum
+{
+    FS_TILE,
+    FS_DATA_LOW,
+    FS_DATA_HIGH,
+    FS_SLEEP,
+    FS_PUSH
+} fetch_state;
+
+typedef struct _fifo_node
+{
+    struct _fifo_node *next;
+    u32 value;
+} fifo_node;
+
+typedef struct
+{
+    fifo_node *front;
+    fifo_node *back;
+    u32 size;
+} fifo;
+
+typedef struct
+{
+    fetch_state cur_fetch_state;
+    fifo pixel_fifo;
+    u8 line_x;
+    u8 push_x;
+    u8 fetch_x;
+    u8 bgw_fetch_data[3];
+    u8 fetch_oam_data[6];
+    u8 map_y;
+    u8 map_x;
+    u8 tile_y;
+    u8 fifo_x;
+} pixel_fifo_context;
+
 typedef struct
 {
     u8 y;
@@ -29,6 +67,8 @@ typedef struct
     u32 current_frame;
     u32 line_ticks;
     u32 *video_buffer;
+
+    pixel_fifo_context pfc;
 } ppu_context;
 
 void ppu_init();

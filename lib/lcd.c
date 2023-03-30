@@ -10,7 +10,7 @@ static unsigned long default_colour[4] = {0xFFFFFFFF, 0xFFAAAAAA, 0xFF555555, 0x
 void lcd_init()
 {
     ctx.lcdc = 0x91;
-    ctx.lcds = 0;
+    //ctx.lcds = 0;
     ctx.scroll_y = 0;
     ctx.scroll_x = 0;
     ctx.ly = 0;

@@ -3,7 +3,7 @@
 #include <ppu.h>
 // https://gbdev.io/pandocs/OAM_DMA_Transfer.html
 
-typedef struct dma
+typedef struct 
 {
     bool active;
     u8 byte;

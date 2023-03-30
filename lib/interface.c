@@ -3,6 +3,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <bus.h>
+#include <ppu.h>
 // https://gbdev.io/pandocs/Rendering.html
 
 SDL_Window *sdlWindow;
@@ -24,9 +25,23 @@ void interface_init()
     TTF_Init();
     printf("TTF INIT\n");
 
+    // Main Window
     SDL_CreateWindowAndRenderer(SCREEN_WIDTH, SCREEN_HEIGHT, 0, &sdlWindow, &sdlRenderer);
 
-    SDL_CreateWindowAndRenderer(16 * 8 * scale, 32 * 8 * scale, 0, &sdlDebugWindow, &sdlDebugRenderer);
+    sdlSurface = SDL_CreateRGBSurface(0, SCREEN_WIDTH, SCREEN_HEIGHT, 32,
+                                      0x00FF0000,
+                                      0x0000FF00,
+                                      0x000000FF,
+                                      0xFF000000);
+
+    sdlTexture = SDL_CreateTexture(sdlRenderer,
+                                   SDL_PIXELFORMAT_ARGB8888,
+                                   SDL_TEXTUREACCESS_STREAMING,
+                                   SCREEN_WIDTH, SCREEN_HEIGHT);
+
+    // Debug Window
+    SDL_CreateWindowAndRenderer(16 * 8 * scale, 32 * 8 * scale, 0,
+                                &sdlDebugWindow, &sdlDebugRenderer);
 
     sdlDebugSurface = SDL_CreateRGBSurface(0, (16 * 8 * scale) + (16 * scale),
                                            (32 * 8 * scale) + (64 * scale), 32,
@@ -117,6 +132,31 @@ void updateDebugWindow()
 
 void interface_update()
 {
+    // Initiaization
+    SDL_Rect rec;
+    rec.x = rec.y = 0;
+    rec.w = rec.h = 2048;
+
+    u32 *video_buffer = get_ppu_context()->video_buffer;
+
+    for (int line_num = 0; line_num < Y_RES; line_num++)
+    {
+        for (int x = 0; x < X_RES; x++)
+        {
+            rec.x = x * scale;
+            rec.y = line_num * scale;
+            rec.w = scale;
+            rec.h = scale;
+
+            SDL_FillRect(sdlSurface, &rec, video_buffer[x + (line_num * X_RES)]);
+        }
+    }
+
+    SDL_UpdateTexture(sdlTexture, NULL, sdlSurface->pixels, sdlSurface->pitch);
+    SDL_RenderClear(sdlRenderer);
+    SDL_RenderCopy(sdlRenderer, sdlTexture, NULL, NULL);
+    SDL_RenderPresent(sdlRenderer);
+
     updateDebugWindow();
 }
 

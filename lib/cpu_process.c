@@ -45,7 +45,7 @@ register_type rt_lookup[] = {
     RT_H,
     RT_L,
     RT_HL,
-    RT_A,
+    RT_A
 };
 
 register_type decode_rt(u8 reg)
@@ -351,6 +351,7 @@ static void proc_ld(cpu_context *ctx)
     register_set(ctx->cur_instruct->reg_1, ctx->fetch_data);
 }
 
+// Caused issue of bugs
 static void proc_ldh(cpu_context *ctx)
 {
     if (ctx->cur_instruct->reg_1 == RT_A)
@@ -359,7 +360,8 @@ static void proc_ldh(cpu_context *ctx)
     }
     else
     {
-        bus_write(0xFF00 | ctx->fetch_data, ctx->regs.a);
+        //bus_write(0xFF00 | ctx->fetch_data, ctx->regs.a);
+        bus_write(ctx->memory_dest, ctx->regs.a);
     }
 
     gboy_cycles(1);

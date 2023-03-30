@@ -3,6 +3,9 @@
 #include <string.h>
 #include <ppu_state_machine.h>
 
+void fifo_reset();
+void fifo_process();
+
 static ppu_context ctx;
 
 ppu_context *get_ppu_context()
@@ -15,6 +18,13 @@ void ppu_init()
     ctx.current_frame = 0;
     ctx.line_ticks = 0;
     ctx.video_buffer = malloc(Y_RES * X_RES * sizeof(32));
+
+    ctx.pfc.line_x = 0;
+    ctx.pfc.push_x = 0;
+    ctx.pfc.fetch_x = 0;
+    ctx.pfc.pixel_fifo.size = 0;
+    ctx.pfc.pixel_fifo.front = ctx.pfc.pixel_fifo.back = NULL;
+    ctx.pfc.cur_fetch_state = FS_TILE;
 
     lcd_init();
     LCDS_MODE_SET(MODE_OAM);
@@ -29,21 +39,21 @@ void ppu_run()
 
     switch (LCDS_MODE)
     {
-        case MODE_OAM:
-            state_mode_oam();
-            break;
+    case MODE_OAM:
+        state_mode_oam();
+        break;
 
-        case MODE_DRAW:
-            state_mode_draw();
-            break;
+    case MODE_DRAW:
+        state_mode_draw();
+        break;
 
-        case MODE_VBLANK:
-            state_mode_vblank();
-            break;
+    case MODE_VBLANK:
+        state_mode_vblank();
+        break;
 
-        case MODE_HBLANK:
-            state_mode_hblank();
-            break;
+    case MODE_HBLANK:
+        state_mode_hblank();
+        break;
     }
 }
 

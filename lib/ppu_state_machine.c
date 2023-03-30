@@ -45,7 +45,7 @@ void state_mode_hblank()
             }
             get_ppu_context()->current_frame++;
 
-            long end_timer = get_ticks();
+            u32 end_timer = get_ticks();
             u32 frame_time = end_timer - prev_frame_time;
 
             if (frame_time < target_frame_time)
@@ -91,13 +91,26 @@ void state_mode_oam()
     if (get_ppu_context()->line_ticks >= 80)
     {
         LCDS_MODE_SET(MODE_DRAW);
+
+        get_ppu_context()->pfc.cur_fetch_state = FS_TILE;
+        get_ppu_context()->pfc.line_x = 0;
+        get_ppu_context()->pfc.fetch_x = 0;
+        get_ppu_context()->pfc.push_x = 0;
+        get_ppu_context()->pfc.fifo_x = 0;
     }
 }
 
 void state_mode_draw()
 {
-    if (get_ppu_context()->line_ticks >= 80 + 172)
+    fifo_process();
+    if (get_ppu_context()->pfc.push_x >= X_RES)
     {
+        fifo_reset();
         LCDS_MODE_SET(MODE_HBLANK);
+
+        if (LCDS_STAT_INT(STAT_HBLANK))
+        {
+            request_interrupt(IF_LCD_STAT);
+        }
     }
 }

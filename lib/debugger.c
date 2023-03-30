@@ -18,6 +18,6 @@ void debugger_print()
 {
     if(result[0])
     {
-        printf("DEBUG: %s\n", result);
+        //printf("DEBUG: %s\n", result);
     }
 }
