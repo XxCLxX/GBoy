@@ -62,11 +62,11 @@ u8 timer_read(u16 address)
 
         //TIMA: Timer counter
         case 0xFF05:
-            return ctx.tima;;
+            return ctx.tima;
 
         //TMA: Timer modulo
         case 0xFF06:
-            return ctx.tma;;
+            return ctx.tma;
 
         //TAC: Timer control
         case 0xFF07:

@@ -23,7 +23,7 @@ void dma_start_address(u8 start)
 
 void dma_tick()
 {
-    if(ctx.active)
+    if(!ctx.active)
     {
         return;
     }

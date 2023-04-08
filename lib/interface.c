@@ -88,7 +88,7 @@ void displayTile(SDL_Surface *surface, u16 start_loc, u16 tileNum, int x, int y)
             u8 colour = high | low;
 
             rec.x = x + ((7 - bit) * scale);
-            rec.y = y + ((tile_y / 2) * scale);
+            rec.y = y + (tile_y / 2 * scale);
             rec.w = scale;
             rec.h = scale;
 

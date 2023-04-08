@@ -52,17 +52,31 @@ typedef struct
     u8 tile;
 
     // Attributes-Flags
-    unsigned flag_palette : 3; // CGB Mode Only
-    unsigned flag_vram : 1;    // CGB Model Only
-    unsigned flag_x_flip : 1;
-    unsigned flag_y_flip : 1;
-    unsigned flag_bg : 1;
+    u8 flag_cgb_palette_num : 3; // CGB Mode Only
+    u8 flag_cgb_vram : 1;        // CGB Model Only
+    u8 flag_x_flip : 1;
+    u8 flag_y_flip : 1;
+    u8 flag_palette_num : 1;
+    u8 flag_bg : 1;
 } oam_context;
+
+typedef struct _oam_line_node
+{
+    oam_context entry;
+    struct _oam_line_node *next;
+} oam_line_node;
 
 typedef struct
 {
     oam_context oam_ram[40];
     u8 vram[0x2000];
+
+    u8 line_sprite_count;
+    oam_line_node *line_sprites;
+    oam_line_node line_entry_array[10];
+
+    u8 fetched_entry_count;
+    oam_context fetched_entries[3];
 
     u32 current_frame;
     u32 line_ticks;

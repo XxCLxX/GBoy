@@ -1,8 +1,12 @@
+#include <string.h>
 #include <cpu.h>
 #include <ppu.h>
 #include <lcd.h>
 #include <interrupt.h>
 // https://gbdev.io/pandocs/pixel_fifo.html
+
+void fifo_reset();
+void fifo_process();
 
 void increment_ly()
 {
@@ -20,6 +24,68 @@ void increment_ly()
     else
     {
         LCDS_LYC_SET(0);
+    }
+}
+
+void load_line_sprites()
+{
+    int current_y = get_lcd_context()->ly;
+
+    u8 sprite_size = LCDC_OBJ_SIZE;
+    memset(get_ppu_context()->line_entry_array, 0,
+           sizeof(get_ppu_context()->line_entry_array));
+
+    for (int i = 0; i < 40; i++)
+    {
+        oam_context ent = get_ppu_context()->oam_ram[i];
+
+        if (!ent.x)
+        {
+            continue;
+        }
+
+        if (get_ppu_context()->line_sprite_count >= 10)
+        {
+            break;
+        }
+
+        if (ent.y <= current_y + 16 && ent.y + sprite_size > current_y + 16)
+        {
+            oam_line_node *entry = &get_ppu_context()->line_entry_array[get_ppu_context()->line_sprite_count++];
+
+            entry->entry = ent;
+            entry->next = NULL;
+
+            if (!get_ppu_context()->line_sprites || get_ppu_context()->line_sprites->entry.x > ent.x)
+            {
+                entry->next = get_ppu_context()->line_sprites;
+                get_ppu_context()->line_sprites = entry;
+                continue;
+            }
+
+            // Sorting
+            oam_line_node *le = get_ppu_context()->line_sprites;
+            oam_line_node *prev = le;
+
+            while (le)
+            {
+                if (le->entry.x > ent.x)
+                {
+                    prev->next = entry;
+                    entry->next = le;
+                    break;
+                }
+
+                if (!le->next)
+                {
+                    le->next = entry;
+                    break;
+                }
+
+                prev = le;
+                le = le->next;
+            }
+        }
     }
 }
 
@@ -97,6 +163,14 @@ void state_mode_oam()
         get_ppu_context()->pfc.fetch_x = 0;
         get_ppu_context()->pfc.push_x = 0;
         get_ppu_context()->pfc.fifo_x = 0;
+    }
+
+    if (get_ppu_context()->line_ticks == 1)
+    {
+        get_ppu_context()->line_sprites = 0;
+        get_ppu_context()->line_sprite_count = 0;
+
+        load_line_sprites();
     }
 }
 

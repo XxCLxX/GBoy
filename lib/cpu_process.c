@@ -29,7 +29,7 @@ void set_flags(cpu_context *ctx, int8_t z, int8_t s, int8_t h, int8_t c)
 
 static void proc_none(cpu_context *ctx)
 {
-    printf("INVALID INSTRUCTION\n");
+    printf("INVALID INSTRUCTION %2X\n", ctx->cur_opcode);
     exit(-7);
 }
 
@@ -45,8 +45,7 @@ register_type rt_lookup[] = {
     RT_H,
     RT_L,
     RT_HL,
-    RT_A
-};
+    RT_A};
 
 register_type decode_rt(u8 reg)
 {
@@ -360,7 +359,7 @@ static void proc_ldh(cpu_context *ctx)
     }
     else
     {
-        //bus_write(0xFF00 | ctx->fetch_data, ctx->regs.a);
+        // bus_write(0xFF00 | ctx->fetch_data, ctx->regs.a);
         bus_write(ctx->memory_dest, ctx->regs.a);
     }
 
@@ -619,8 +618,8 @@ static void proc_sbc(cpu_context *ctx)
     u8 v = ctx->fetch_data + FLAG_C;
 
     int z = register_read(ctx->cur_instruct->reg_1) - v == 0;
-    int h = ((int)register_read(ctx->cur_instruct->reg_1) & 0xF) - ((int)FLAG_C) < 0;
-    int c = ((int)register_read(ctx->cur_instruct->reg_1)) - ((int)FLAG_C) < 0;
+    int h = ((int)register_read(ctx->cur_instruct->reg_1) & 0xF) - ((int)ctx->fetch_data & 0xF) - ((int)FLAG_C) < 0;
+    int c = ((int)register_read(ctx->cur_instruct->reg_1)) - ((int)ctx->fetch_data) - ((int)FLAG_C) < 0;
 
     register_set(ctx->cur_instruct->reg_1, register_read(ctx->cur_instruct->reg_1) - v);
     set_flags(ctx, z, 1, h, c);
@@ -662,8 +661,7 @@ static IN_PROCESS processors[] =
         [IN_CPL] = proc_cpl,
         [IN_SCF] = proc_scf,
         [IN_CCF] = proc_ccf,
-        [IN_EI] = proc_ei
-        };
+        [IN_EI] = proc_ei};
 
 IN_PROCESS inst_get_processor(instruction_type type)
 {

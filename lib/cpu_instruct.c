@@ -431,7 +431,6 @@ void disassemble(cpu_context *ctx, char *str)
     case AM_A8_R:
         sprintf(str, "%s $%02X,%s", instruction_name(opcode->type),
                 bus_read(ctx->regs.pc - 1), register_lookup[opcode->reg_2]);
-
         return;
 
     case AM_HL_SPR:

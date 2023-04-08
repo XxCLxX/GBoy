@@ -10,7 +10,7 @@ static unsigned long default_colour[4] = {0xFFFFFFFF, 0xFFAAAAAA, 0xFF555555, 0x
 void lcd_init()
 {
     ctx.lcdc = 0x91;
-    //ctx.lcds = 0;
+    // ctx.lcds = 0;
     ctx.scroll_y = 0;
     ctx.scroll_x = 0;
     ctx.ly = 0;
@@ -91,6 +91,6 @@ void lcd_write(u16 address, u8 value)
     }
     else if (address == 0xFF49)
     {
-        update_palette_data(value & 0b11111100, 1);
+        update_palette_data(value & 0b11111100, 2);
     }
 }
