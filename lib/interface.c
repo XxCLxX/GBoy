@@ -4,6 +4,7 @@
 #include <SDL2/SDL_ttf.h>
 #include <bus.h>
 #include <ppu.h>
+#include <joypad.h>
 // https://gbdev.io/pandocs/Rendering.html
 
 SDL_Window *sdlWindow;
@@ -160,11 +161,64 @@ void interface_update()
     updateDebugWindow();
 }
 
+void interface_on_key(bool pressed, u32 key_code)
+{
+    switch (key_code)
+    {
+    case SDLK_o:
+        get_joypad_state()->b = pressed;
+        break;
+
+    case SDLK_p:
+        get_joypad_state()->a = pressed;
+        break;
+
+    case SDLK_k:
+        get_joypad_state()->start = pressed;
+        break;
+
+    case SDLK_l:
+        get_joypad_state()->select = pressed;
+        break;
+
+    case SDLK_UP:
+    case SDLK_w:
+        get_joypad_state()->up = pressed;
+        break;
+
+    case SDL_CONTROLLER_AXIS_LEFTX:
+    case SDLK_DOWN:
+    case SDLK_s:
+        get_joypad_state()->down = pressed;
+        break;
+
+    case SDLK_LEFT:
+    case SDLK_a:
+        get_joypad_state()->left = pressed;
+        break;
+
+    case SDLK_RIGHT:
+    case SDLK_d:
+        get_joypad_state()->right = pressed;
+        break;
+    }
+}
+
 void interface_handle_events()
 {
     SDL_Event e;
     while (SDL_PollEvent(&e) > 0)
     {
+        if (e.type == SDL_KEYDOWN)
+        {
+            interface_on_key(true, e.key.keysym.sym);
+        }
+
+        if (e.type == SDL_KEYUP)
+        {
+            interface_on_key(false, e.key.keysym.sym);
+        }
+
         if (e.type == SDL_WINDOWEVENT && e.window.event == SDL_WINDOWEVENT_CLOSE)
         {
             gboy_get_context()->close = true;
