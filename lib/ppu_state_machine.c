@@ -7,9 +7,16 @@
 
 void fifo_reset();
 void fifo_process();
+bool window_visible();
 
 void increment_ly()
 {
+    if (window_visible() && get_lcd_context()->ly >= get_lcd_context()->WY &&
+        get_lcd_context()->ly < get_lcd_context()->WY + Y_RES)
+    {
+        get_ppu_context()->window_line++;
+    }
+
     get_lcd_context()->ly++;
 
     if (get_lcd_context()->ly == get_lcd_context()->ly_compare)
@@ -147,6 +154,7 @@ void state_mode_vblank()
         {
             LCDS_MODE_SET(MODE_OAM);
             get_lcd_context()->ly = 0;
+            get_ppu_context()->window_line = 0;
         }
         get_ppu_context()->line_ticks = 0;
     }
