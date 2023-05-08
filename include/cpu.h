@@ -47,16 +47,13 @@ void reg8_set(register_type rt, u8 v);
 u8 ie_register_get();
 void ie_register_set(u8 n);
 
-u8 interrupt_flag_get();
-void interrupt_flag_set(u8 n);
+u8 get_interrupt_flags();
+void set_interrupt_flags(u8 value);
 
 typedef void (*IN_PROCESS)(cpu_context *);
 IN_PROCESS inst_get_processor(instruction_type type);
 
 void disassemble(cpu_context *ctx, char *str);
-
-u8 get_interrupt_flags();
-void set_interrupt_flags(u8 value);
 
 //F - Flag Register
 #define FLAG_Z BIT(ctx->regs.f, 7) //Zero

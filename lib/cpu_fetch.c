@@ -9,7 +9,7 @@ void fetched_data()
     ctx.memory_dest = 0;
     ctx.dest_is_memory = false;
 
-    if(ctx.cur_instruct == NULL)
+    if (ctx.cur_instruct == NULL)
     {
         return;
     }
@@ -19,23 +19,23 @@ void fetched_data()
     case AM_IMP:
         return;
 
-    //Fetch data from the 1st register
-    case AM_R:
+    // Fetch data from the 1st register
+    case AM_REG:
         ctx.fetch_data = register_read(ctx.cur_instruct->reg_1);
         return;
 
-    //Fetch data from the 2nd register
-    case AM_R_R:
+    // Fetch data from the 2nd register
+    case AM_REG_REG:
         ctx.fetch_data = register_read(ctx.cur_instruct->reg_2);
         return;
 
-    case AM_R_D8:
+    case AM_REG_D8:
         ctx.fetch_data = bus_read(ctx.regs.pc);
         gboy_cycles(1);
         ctx.regs.pc++;
         return;
 
-    case AM_R_D16: 
+    case AM_REG_D16:
     case AM_D16:
     {
         u16 low = bus_read(ctx.regs.pc);
@@ -49,77 +49,78 @@ void fetched_data()
         return;
     }
 
-    //Loading register into memory region/address (Ex. Loading A to address BC)
-    case AM_MR_R:
+    // Loading register into memory region/address (Ex. Loading A to address BC)
+    case AM_MEMORYREG_REG:
         ctx.fetch_data = register_read(ctx.cur_instruct->reg_2);
         ctx.memory_dest = register_read(ctx.cur_instruct->reg_1);
         ctx.dest_is_memory = true;
 
-        if(ctx.cur_instruct->reg_1 == RT_C)
+        if (ctx.cur_instruct->reg_1 == RT_C)
         {
             ctx.memory_dest |= 0xFF00;
         }
         return;
 
-    //Reading from a memory region/address
-    case AM_R_MR:
+    // Reading from a memory region/address
+    case AM_REG_MEMORYREG:
     {
         u16 address = register_read(ctx.cur_instruct->reg_2);
 
-        if(ctx.cur_instruct->reg_2 == RT_C)
+        if (ctx.cur_instruct->reg_2 == RT_C)
         {
             address |= 0xFF00;
         }
 
         ctx.fetch_data = bus_read(address);
         gboy_cycles(1);
-    }return;
+    }
+        return;
 
-    //Loading address of the HL register then increment it.
-    case AM_R_HLI:
+    // Loading address of the HL register then increment it.
+    case AM_REG_HLI:
         ctx.fetch_data = bus_read(register_read(ctx.cur_instruct->reg_2));
         gboy_cycles(1);
         register_set(RT_HL, register_read(RT_HL) + 1);
         return;
 
-    //Move register value into HL address then increment it.
-    case AM_HLI_R:
+    // Move register value into HL address then increment it.
+    case AM_HLI_REG:
         ctx.fetch_data = register_read(ctx.cur_instruct->reg_2);
         ctx.memory_dest = register_read(ctx.cur_instruct->reg_1);
         ctx.dest_is_memory = true;
         register_set(RT_HL, register_read(RT_HL) + 1);
         return;
 
-    //Loading address of the HL register then decrement it.
-    case AM_R_HLD:
+    // Loading address of the HL register then decrement it.
+    case AM_REG_HLD:
         ctx.fetch_data = bus_read(register_read(ctx.cur_instruct->reg_2));
         gboy_cycles(1);
         register_set(RT_HL, register_read(RT_HL) - 1);
         return;
 
-    //Move register value into HL address then decrement it.
-    case AM_HLD_R:
+    // Move register value into HL address then decrement it.
+    case AM_HLD_REG:
         ctx.fetch_data = register_read(ctx.cur_instruct->reg_2);
         ctx.memory_dest = register_read(ctx.cur_instruct->reg_1);
         ctx.dest_is_memory = true;
         register_set(RT_HL, register_read(RT_HL) - 1);
         return;
 
-    case AM_R_A8:
+    case AM_REG_A8:
         ctx.fetch_data = bus_read(ctx.regs.pc);
         gboy_cycles(1);
         ctx.regs.pc++;
         return;
 
-    //Moving register to A8
-    case AM_A8_R:
+    // Moving register to A8
+    case AM_A8_REG:
         ctx.memory_dest = bus_read(ctx.regs.pc) | 0xFF00;
         ctx.dest_is_memory = true;
         gboy_cycles(1);
         ctx.regs.pc++;
         return;
 
-    //Load stack pointer to HL and incremented by r8 (only 1 instruction for this)
+    // Load stack pointer to HL and incremented by r8 (only 1 instruction for this)
     case AM_HL_SPR:
         ctx.fetch_data = bus_read(ctx.regs.pc);
         gboy_cycles(1);
@@ -131,15 +132,15 @@ void fetched_data()
         gboy_cycles(1);
         ctx.regs.pc++;
         return;
-    
-    //Moving register to a 16-bit address
-    case AM_A16_R:
-    case AM_D16_R:
+
+    // Moving register to a 16-bit address
+    case AM_A16_REG:
+    case AM_D16_REG:
     {
         u16 low = bus_read(ctx.regs.pc);
         gboy_cycles(1);
 
-        u16 high = bus_read(ctx.regs.pc+1);
+        u16 high = bus_read(ctx.regs.pc + 1);
         gboy_cycles(1);
 
         ctx.memory_dest = low | (high << 8);
@@ -147,10 +148,11 @@ void fetched_data()
 
         ctx.regs.pc += 2;
         ctx.fetch_data = register_read(ctx.cur_instruct->reg_2);
-    }return;
+    }
+        return;
 
-    //Loading D8 to memory region/address
-    case AM_MR_D8:
+    // Loading D8 to memory region/address
+    case AM_MEMORYREG_D8:
         ctx.fetch_data = bus_read(ctx.regs.pc);
         gboy_cycles(1);
         ctx.regs.pc++;
@@ -158,19 +160,19 @@ void fetched_data()
         ctx.dest_is_memory = true;
         return;
 
-    case AM_MR:
+    case AM_MEMORYREG:
         ctx.memory_dest = register_read(ctx.cur_instruct->reg_1);
         ctx.dest_is_memory = true;
         ctx.fetch_data = bus_read(register_read(ctx.cur_instruct->reg_1));
         gboy_cycles(1);
         return;
 
-    case AM_R_A16: 
+    case AM_REG_A16:
     {
         u16 low = bus_read(ctx.regs.pc);
         gboy_cycles(1);
 
-        u16 high = bus_read(ctx.regs.pc+1);
+        u16 high = bus_read(ctx.regs.pc + 1);
         gboy_cycles(1);
 
         u16 address = low | (high << 8);

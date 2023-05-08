@@ -15,6 +15,7 @@ gboy_context *gboy_get_context()
 
 void *cpu_running(void *p)
 {
+    // Initialize the timer and CPU
     timer_init();
     cpu_init();
 
@@ -76,8 +77,10 @@ int gboy_run(int argc, char **argv)
 
 void gboy_cycles(int cpu_cycles)
 {
+    // Convert the number of CPU cycles to clock cycles
     int n = cpu_cycles * 4;
 
+    // Execute the specified number of clock cycles, and increment the tick count for each cycle
     for(int i=0; i<n; i++)
     {
         ctx.ticks++;

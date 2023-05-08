@@ -1,11 +1,13 @@
 #include <io.h>
 #include <timer.h>
 #include <cpu.h>
+//#include <assert.h>
 // https://gbdev.io/pandocs/Serial_Data_Transfer_(Link_Cable).html
 
 static char serial_data[2];
 u8 io_read(u16 address)
 {
+    //assert(address <= 0xFFFF);
     if (address == 0xFF01)
     {
         return serial_data[0];
@@ -30,6 +32,7 @@ u8 io_read(u16 address)
 
 void io_write(u16 address, u8 value)
 {
+    //assert(address <= 0xFFFF);
     if (address == 0xFF01)
     {
         serial_data[0] = value;

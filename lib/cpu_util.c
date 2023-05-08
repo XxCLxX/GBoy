@@ -210,7 +210,7 @@ u8 get_interrupt_flags()
     return ctx.interrupt_flag;
 }
 
-void set_interrupt_flags(u8 n)
+void set_interrupt_flags(u8 value)
 {
-    ctx.interrupt_flag = n;
+    ctx.interrupt_flag = value;
 }
