@@ -186,7 +186,6 @@ void interface_on_key(bool pressed, u32 key_code)
         get_joypad_state()->up = pressed;
         break;
 
-    case SDL_CONTROLLER_AXIS_LEFTX:
     case SDLK_DOWN:
     case SDLK_s:
         get_joypad_state()->down = pressed;

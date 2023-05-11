@@ -11,7 +11,7 @@ typedef struct
 static cart_context ctx;
 
 // Reference from Pan Docs
-static const char *LIC_CODE[0xD7] =
+static const char *LIC_CODE[0x100] =
     {
         [0x00] = "None", // New licensee code
         [0x01] = "Nintendo R&D1",
@@ -111,7 +111,29 @@ static const char *LIC_CODE[0xD7] =
         [0xD2] = "Quest",
         [0xD3] = "Sigma Enterprises",
         [0xD4] = "ASK Kodansha Co.",
-        [0xD6] = "Naxat Soft"};
+        [0xD6] = "Naxat Soft",
+        [0xD7] = "Copya System",
+        [0xD9] = "Banpresto",
+        [0xDA] = "Tomy",
+        [0xDB] = "LJN",
+        [0xDD] = "NCS",
+        [0xDE] = "Human",
+        [0xDF] = "Altron",
+        [0xE0] = "Jaleco",
+        [0xE1] = "Towa Chiki",
+        [0xE2] = "Yutaka",
+        [0xE3] = "Varie",
+        [0xE5] = "Epcoh",
+        [0xE7] = "Athena",
+        [0xE8] = "Asmik ACE Entertainmnent",
+        [0xE9] = "Natsume",
+        [0xEA] = "King Records",
+        [0xEB] = "Atlus",
+        [0xEC] = "Epic/Sony Records",
+        [0xEE] = "IGS",
+        [0xF0] = "A Wave",
+        [0xF3] = "Extreme Entertainment",
+        [0xFF] = "LGN"};
 
 static const char *CART_TYPES[] =
     {
@@ -178,7 +200,7 @@ bool load_cartridge(char *cart)
 
     FILE *f = fopen(cart, "rb");
 
-    if (!f)
+    if (f == NULL)
     {
         printf("Failed to open the file: %s\n", cart);
         return false;
@@ -221,7 +243,7 @@ bool load_cartridge(char *cart)
         check = check - ctx.rom_data[address] - 1;
     }
     printf("\t Checksum: %2.2X (%s)\n", ctx.header->checksum, (check & 0xFF) ? "Passed" : "Failed");
-    return true; // or 1
+    return true; 
 }
 
 u8 rom_read(u16 address)
@@ -232,5 +254,5 @@ u8 rom_read(u16 address)
 void rom_write(u16 address, u8 value)
 {
     printf("rom_write(%04X)\n", address);
-    // NO_IMPLEM;
+    //NO_IMPLEM;
 }
