@@ -6,10 +6,11 @@ static lcd_context ctx;
 
 static unsigned long default_colour[4] = {0xFFFFFFFF, 0xFFAAAAAA, 0xFF555555, 0xFF000000};
 
+//void lcd_init(u32 *palette)
 void lcd_init()
 {
     ctx.lcdc = 0x91;
-    //ctx.lcds = 0;
+    // ctx.lcds = 0;
     ctx.scroll_y = 0;
     ctx.scroll_x = 0;
     ctx.ly = 0;
@@ -26,6 +27,13 @@ void lcd_init()
         ctx.sprite1_colour[i] = default_colour[i];
         ctx.sprite2_colour[i] = default_colour[i];
     }
+
+    /*for (int i = 0; i < 4; i++)
+    {
+        ctx.bg_colour[i] = palette[i];
+        ctx.sprite1_colour[i] = palette[i];
+        ctx.sprite2_colour[i] = palette[i];
+    }*/
 }
 
 lcd_context *get_lcd_context()
@@ -47,6 +55,7 @@ u8 lcd_read(u16 address)
     Bit 3-2 - Color for index 1
     Bit 1-0 - Color for index 0
 */
+// void update_palette_data(u8 palette_data, u8 col, u32 *palette)
 void update_palette_data(u8 palette_data, u8 col)
 {
     u32 *colour = ctx.bg_colour;
@@ -66,6 +75,11 @@ void update_palette_data(u8 palette_data, u8 col)
     colour[1] = default_colour[(palette_data >> 2) & 0b11];
     colour[2] = default_colour[(palette_data >> 4) & 0b11];
     colour[3] = default_colour[(palette_data >> 6) & 0b11];
+
+    /*colour[0] = palette[palette_data & 0b11];
+    colour[1] = palette[(palette_data >> 2) & 0b11];
+    colour[2] = palette[(palette_data >> 4) & 0b11];
+    colour[3] = palette[(palette_data >> 6) & 0b11];*/
 }
 
 void lcd_write(u16 address, u8 value)

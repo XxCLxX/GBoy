@@ -3,6 +3,7 @@
     "files.associations": {
         "cartridge.h": "c",
         "interrupt.h": "c",
-        "ppu.h": "c"
+        "ppu.h": "c",
+        "ppu_state_machine.h": "c"
     },
 }

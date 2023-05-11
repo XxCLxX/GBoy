@@ -142,7 +142,9 @@ void fifo_load_sprite_tile()
         {
             get_ppu_context()->fetched_entries[get_ppu_context()->fetched_entry_count++] = le->entry;
         }
+
         le = le->next;
+
         if (!le || get_ppu_context()->fetched_entry_count >= 3)
         {
             break;
@@ -183,6 +185,7 @@ void fifo_load_window_tile()
     }
 
     u8 window_y = get_lcd_context()->WY;
+
     if (get_ppu_context()->pfc.fetch_x + 7 >= get_lcd_context()->WX &&
         get_ppu_context()->pfc.fetch_x + 7 < get_lcd_context()->WX + Y_RES + 14)
     {
@@ -215,6 +218,7 @@ void fifo_fetcher()
     case FS_TILE:
     {
         get_ppu_context()->fetched_entry_count = 0;
+
         if (LCDC_BGW_ENABLE)
         {
             get_ppu_context()->pfc.bgw_fetch_data[0] = bus_read(LCDC_BG_MAP_AREA +

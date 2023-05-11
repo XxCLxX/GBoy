@@ -101,7 +101,7 @@ void updateDebugWindow()
 {
     int x_draw = 0;
     int y_draw = 0;
-    int title_num = 0;
+    int tile_num = 0;
 
     SDL_Rect rec;
     rec.x = 0;
@@ -117,9 +117,9 @@ void updateDebugWindow()
     {
         for (int x = 0; x < 16; x++)
         {
-            displayTile(sdlDebugSurface, address, title_num, x_draw + (x * scale), y_draw + (y * scale));
+            displayTile(sdlDebugSurface, address, tile_num, x_draw + (x * scale), y_draw + (y * scale));
             x_draw += (8 * scale);
-            title_num++;
+            tile_num++;
         }
         y_draw += (8 * scale);
         x_draw = 0;
@@ -160,6 +160,38 @@ void interface_update()
     updateDebugWindow();
 }
 
+static unsigned long colour_palette_1[4] = {0xFFFFFFFF, 0xFFAAAAAA, 0xFF555555, 0xFF000000};
+static unsigned long colour_palette_2[4] = {0xFFFFF6D3, 0xFFF9A875, 0xFFeB6B6F, 0xFF7C3F58};
+static unsigned long colour_palette_3[4] = {0xFFD0D058, 0xFFA0A840, 0xFF708028, 0xFF405010};
+static unsigned long colour_palette_4[4] = {0xFFFFFFFF, 0xFFAAAAAA, 0xFF555555, 0xFF000000};
+
+void change_palette(unsigned long *palette, int size)
+{
+    // SDL_Surface *surface
+    sdlDebugSurface = SDL_CreateRGBSurface(0, SCREEN_WIDTH, SCREEN_HEIGHT, 32,
+                                           0x00FF0000,
+                                           0x0000FF00,
+                                           0x000000FF,
+                                           0xFF000000);
+    SDL_LockSurface(sdlDebugSurface);
+    memcpy(sdlDebugSurface->pixels, get_ppu_context()->video_buffer, SCREEN_WIDTH * SCREEN_HEIGHT * 4);
+    SDL_UnlockSurface(sdlDebugSurface);
+
+    SDL_PixelFormat *format = sdlDebugSurface->format;
+    u32 *pixels = (u32 *)sdlDebugSurface->pixels;
+    for (int i = 0; i < SCREEN_WIDTH * SCREEN_HEIGHT; i++)
+    {
+        Uint8 r, g, b;
+        SDL_GetRGB(pixels[i], format, &r, &g, &b);
+        pixels[i] = SDL_MapRGB(format, (palette[r >> 6] >> 16) & 0xFF, (palette[g >> 6] >> 8) & 0xFF, (palette[b >> 6]) & 0xFF);
+    }
+
+    SDL_UpdateTexture(sdlDebugTexture, NULL, sdlDebugSurface->pixels, SCREEN_WIDTH * 4);
+    SDL_RenderClear(sdlDebugRenderer);
+    SDL_RenderCopy(sdlDebugRenderer, sdlDebugTexture, NULL, NULL);
+    SDL_RenderPresent(sdlDebugRenderer);
+}
+
 void interface_handle_events()
 {
     SDL_Event e;
@@ -168,6 +200,27 @@ void interface_handle_events()
         if (e.type == SDL_WINDOWEVENT && e.window.event == SDL_WINDOWEVENT_CLOSE)
         {
             gboy_get_context()->close = true;
+
+            switch (e.type)
+            {
+            case SDL_KEYDOWN:
+                switch (e.key.keysym.sym)
+                {
+                case SDLK_1:
+                    change_palette(colour_palette_1, 4);
+                    break;
+                case SDLK_2:
+                    change_palette(colour_palette_2, 4);
+                    break;
+                case SDLK_3:
+                    change_palette(colour_palette_3, 4);
+                    break;
+                case SDLK_4:
+                    change_palette(colour_palette_4, 4);
+                    break;
+                }
+                break;
+            }
         }
     }
 }

@@ -218,7 +218,7 @@ static void proc_cb(cpu_context *ctx)
 static void proc_stop(cpu_context *ctx)
 {
     fprintf(stderr, "STOP\n");
-    NO_IMPLEM
+    //NO_IMPLEM
 }
 
 static void proc_daa(cpu_context *ctx)
@@ -350,7 +350,6 @@ static void proc_ld(cpu_context *ctx)
     register_set(ctx->cur_instruct->reg_1, ctx->fetch_data);
 }
 
-// Caused issue of bugs
 static void proc_ldh(cpu_context *ctx)
 {
     if (ctx->cur_instruct->reg_1 == RT_A)
@@ -496,7 +495,7 @@ static void proc_inc(cpu_context *ctx)
         gboy_cycles(1);
     }
 
-    if (ctx->cur_instruct->reg_1 == RT_HL && ctx->cur_instruct->mode == AM_MR)
+    if (ctx->cur_instruct->reg_1 == RT_HL && ctx->cur_instruct->mode == AM_MEMORYREG)
     {
         v = bus_read(register_read(RT_HL)) + 1;
         v &= 0xFF;
@@ -526,7 +525,7 @@ static void proc_dec(cpu_context *ctx)
         gboy_cycles(1);
     }
 
-    if (ctx->cur_instruct->reg_1 == RT_HL && ctx->cur_instruct->mode == AM_MR)
+    if (ctx->cur_instruct->reg_1 == RT_HL && ctx->cur_instruct->mode == AM_MEMORYREG)
     {
         v = bus_read(register_read(RT_HL)) - 1;
         // v &= 0xFF;
@@ -627,41 +626,41 @@ static void proc_sbc(cpu_context *ctx)
 
 static IN_PROCESS processors[] =
     {
-        [IN_NONE] = proc_none,
-        [IN_NOP] = proc_nop,
-        [IN_LD] = proc_ld,
-        [IN_LDH] = proc_ldh,
-        [IN_POP] = proc_pop,
-        [IN_PUSH] = proc_push,
-        [IN_JP] = proc_jp,
-        [IN_JR] = proc_jr,
-        [IN_CALL] = proc_call,
-        [IN_RET] = proc_ret,
-        [IN_RETI] = proc_reti,
-        [IN_RST] = proc_rst,
-        [IN_INC] = proc_inc,
-        [IN_DEC] = proc_dec,
-        [IN_ADD] = proc_add,
-        [IN_ADC] = proc_adc,
-        [IN_SUB] = proc_sub,
-        [IN_SBC] = proc_sbc,
-        [IN_DI] = proc_di,
-        [IN_XOR] = proc_xor,
-        [IN_AND] = proc_and,
-        [IN_OR] = proc_or,
-        [IN_CP] = proc_cp,
-        [IN_CB] = proc_cb,
-        [IN_RRA] = proc_rra,
-        [IN_RLA] = proc_rla,
-        [IN_RRCA] = proc_rrca,
-        [IN_RLCA] = proc_rlca,
-        [IN_STOP] = proc_stop,
-        [IN_HALT] = proc_halt,
-        [IN_DAA] = proc_daa,
-        [IN_CPL] = proc_cpl,
-        [IN_SCF] = proc_scf,
-        [IN_CCF] = proc_ccf,
-        [IN_EI] = proc_ei};
+        [OP_NONE] = proc_none,
+        [OP_NOP] = proc_nop,
+        [OP_LD] = proc_ld,
+        [OP_LDH] = proc_ldh,
+        [OP_POP] = proc_pop,
+        [OP_PUSH] = proc_push,
+        [OP_JP] = proc_jp,
+        [OP_JR] = proc_jr,
+        [OP_CALL] = proc_call,
+        [OP_RET] = proc_ret,
+        [OP_RETI] = proc_reti,
+        [OP_RST] = proc_rst,
+        [OP_INC] = proc_inc,
+        [OP_DEC] = proc_dec,
+        [OP_ADD] = proc_add,
+        [OP_ADC] = proc_adc,
+        [OP_SUB] = proc_sub,
+        [OP_SBC] = proc_sbc,
+        [OP_DI] = proc_di,
+        [OP_XOR] = proc_xor,
+        [OP_AND] = proc_and,
+        [OP_OR] = proc_or,
+        [OP_CP] = proc_cp,
+        [OP_CB] = proc_cb,
+        [OP_RRA] = proc_rra,
+        [OP_RLA] = proc_rla,
+        [OP_RRCA] = proc_rrca,
+        [OP_RLCA] = proc_rlca,
+        [OP_STOP] = proc_stop,
+        [OP_HALT] = proc_halt,
+        [OP_DAA] = proc_daa,
+        [OP_CPL] = proc_cpl,
+        [OP_SCF] = proc_scf,
+        [OP_CCF] = proc_ccf,
+        [OP_EI] = proc_ei};
 
 IN_PROCESS inst_get_processor(instruction_type type)
 {
