@@ -3,6 +3,7 @@
 #include <ppu.h>
 #include <lcd.h>
 #include <interrupt.h>
+#include <cartridge.h>
 // https://gbdev.io/pandocs/pixel_fifo.html
 
 void fifo_reset();
@@ -133,6 +134,11 @@ void state_mode_hblank()
                 frame_count = 0;
 
                 printf("FPS: %d\n", fps);
+
+                if (cartridge_need_save())
+                {
+                    cartridge_battery_save();
+                }
             }
             frame_count++;
             prev_frame_time = get_ticks();

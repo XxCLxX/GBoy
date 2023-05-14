@@ -48,7 +48,7 @@ u8 ie_register_get();
 void ie_register_set(u8 n);
 
 u8 get_interrupt_flags();
-void set_interrupt_flags(u8 n);
+void set_interrupt_flags(u8 value);
 
 typedef void (*IN_PROCESS)(cpu_context *);
 IN_PROCESS inst_get_processor(instruction_type type);

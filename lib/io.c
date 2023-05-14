@@ -34,6 +34,12 @@ u8 io_read(u16 address)
         return get_interrupt_flags();
     }
 
+    // Block Audio
+    if (BETWEEN(address, 0xFF10, 0xFF3F))
+    {
+        return 0;
+    }
+
     if (BETWEEN(address, 0xFF40, 0xFF4B))
     {
         return lcd_read(address);
@@ -71,6 +77,12 @@ void io_write(u16 address, u8 value)
     if (address == 0xFF0F)
     {
         set_interrupt_flags(value);
+        return;
+    }
+
+    //Block Audio
+    if (BETWEEN(address, 0xFF10, 0xFF3F))
+    {
         return;
     }
 

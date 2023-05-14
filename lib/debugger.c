@@ -28,19 +28,19 @@ void debugger_update()
 
 void debugger_print()
 {
-    /*if (read_index != write_index)
+    if (read_index != write_index)
     {
         int i;
-        printf("DEBUG: ");
+        // printf("DEBUG: ");
         for (i = read_index; i != write_index; i = (i + 1) % DEBUG_SIZE)
         {
-            printf("%c", buffer[i]);
+            // printf("%c", buffer[i]);
         }
-        printf("\n");
+        // printf("\n");
 
-        // read_index = write_index;
-        // memset(buffer, 0, DEBUG_SIZE);
-    }*/
+        read_index = write_index;
+        memset(buffer, 0, DEBUG_SIZE);
+    }
 }
 
 /*static char result[1024] = {0};
