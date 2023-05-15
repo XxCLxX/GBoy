@@ -42,15 +42,15 @@ u8 joypad_get_output()
         {
             output &= ~(1 << 3);
         }
-        else if (get_joypad_state()->select)
+        if (get_joypad_state()->select)
         {
             output &= ~(1 << 2);
         }
-        else if (get_joypad_state()->a)
+        if (get_joypad_state()->a)
         {
             output &= ~(1 << 0);
         }
-        else if (get_joypad_state()->b)
+        if (get_joypad_state()->b)
         {
             output &= ~(1 << 1);
         }
@@ -62,15 +62,15 @@ u8 joypad_get_output()
         {
             output &= ~(1 << 1);
         }
-        else if (get_joypad_state()->right)
+        if (get_joypad_state()->right)
         {
             output &= ~(1 << 0);
         }
-        else if (get_joypad_state()->up)
+        if (get_joypad_state()->up)
         {
             output &= ~(1 << 2);
         }
-        else if (get_joypad_state()->down)
+        if (get_joypad_state()->down)
         {
             output &= ~(1 << 3);
         }
