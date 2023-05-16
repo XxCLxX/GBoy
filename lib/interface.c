@@ -27,6 +27,12 @@ void interface_init()
     TTF_Init();
     printf("TTF INIT\n");
 
+    SDL_Init(SDL_INIT_JOYSTICK);
+    if (SDL_NumJoysticks() > 0)
+    {
+        SDL_JoystickOpen(0); // Open the first joystick (Xbox controller)
+    }
+
     // Main Window
     SDL_CreateWindowAndRenderer(SCREEN_WIDTH, SCREEN_HEIGHT, 0, &sdlWindow, &sdlRenderer);
 
@@ -259,6 +265,83 @@ void interface_handle_events()
         if (e.type == SDL_KEYUP)
         {
             interface_on_key(false, e.key.keysym.sym);
+        }
+
+        if (e.type == SDL_JOYBUTTONDOWN)
+        {
+            if (e.jbutton.which == 0)
+            {
+                switch (e.jbutton.button)
+                {
+                case SDL_CONTROLLER_BUTTON_A:
+                    interface_on_key(true, SDLK_p);
+                    break;
+
+                case SDL_CONTROLLER_BUTTON_B:
+                    interface_on_key(true, SDLK_o);
+                    break;
+
+                case SDL_CONTROLLER_BUTTON_START:
+                    interface_on_key(true, SDLK_k);
+                    break;
+
+                case SDL_CONTROLLER_BUTTON_X:
+                    interface_on_key(true, SDLK_l);
+                    break;
+                }
+            }
+        }
+
+        if (e.type == SDL_JOYBUTTONUP)
+        {
+            if (e.jbutton.which == 0)
+            {
+                switch (e.jbutton.button)
+                {
+                case SDL_CONTROLLER_BUTTON_A:
+                    interface_on_key(false, SDLK_p);
+                    break;
+
+                case SDL_CONTROLLER_BUTTON_B:
+                    interface_on_key(false, SDLK_o);
+                    break;
+
+                case SDL_CONTROLLER_BUTTON_START:
+                    interface_on_key(false, SDLK_k);
+                    break;
+
+                case SDL_CONTROLLER_BUTTON_X:
+                    interface_on_key(false, SDLK_l);
+                    break;
+                }
+            }
+        }
+
+        if (e.type == SDL_JOYHATMOTION)
+        {
+            if (e.jhat.which == 0)
+            {
+                int hatMotion = SDL_JoystickGetHat(SDL_JoystickOpen(0), 0);
+
+                if (hatMotion & SDL_HAT_UP)
+                    interface_on_key(true, SDLK_UP);
+
+                else if (hatMotion & SDL_HAT_DOWN)
+                    interface_on_key(true, SDLK_DOWN);
+
+                else if (hatMotion & SDL_HAT_LEFT)
+                    interface_on_key(true, SDLK_LEFT);
+
+                else if (hatMotion & SDL_HAT_RIGHT)
+                    interface_on_key(true, SDLK_RIGHT);
+                else
+                {
+                    interface_on_key(false, SDLK_UP);
+                    interface_on_key(false, SDLK_DOWN);
+                    interface_on_key(false, SDLK_LEFT);
+                    interface_on_key(false, SDLK_RIGHT);
+                }
+            }
         }
 
         if (e.type == SDL_WINDOWEVENT && e.window.event == SDL_WINDOWEVENT_CLOSE)
