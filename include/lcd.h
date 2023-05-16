@@ -16,9 +16,13 @@ typedef struct
     u8 WY;         // Window Y position
     u8 WX;         // Window X position
 
+    //unsigned long
     u32 bg_colour[4];
     u32 sprite1_colour[4];
     u32 sprite2_colour[4];
+
+    //unsigned int
+    u32 current_color_scheme;
 } lcd_context;
 
 typedef enum

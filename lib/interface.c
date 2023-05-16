@@ -5,6 +5,7 @@
 #include <bus.h>
 #include <ppu.h>
 #include <joypad.h>
+#include <lcd.h>
 // https://gbdev.io/pandocs/Rendering.html
 
 SDL_Window *sdlWindow;
@@ -70,7 +71,10 @@ u32 get_ticks()
     return SDL_GetTicks();
 }
 
-static unsigned long colour_palette[4] = {0xFFFFFFFF, 0xFFAAAAAA, 0xFF555555, 0xFF000000};
+static unsigned long colour_palette[][4] = {{0xFFFFFFFF, 0xFFAAAAAA, 0xFF555555, 0xFF000000},
+                                            {0xFFFFF6D3, 0xFFF9A875, 0xFFEB6B6F, 0xFF7C3F58},
+                                            {0xFFD0D058, 0xFFA0A840, 0xFF708028, 0xFF405010},
+                                            {0xFFCCA66E, 0xFF99683D, 0xFF664930, 0xFF332920}};
 
 void displayTile(SDL_Surface *surface, u16 start_loc, u16 tileNum, int x, int y)
 {
@@ -93,7 +97,7 @@ void displayTile(SDL_Surface *surface, u16 start_loc, u16 tileNum, int x, int y)
             rec.w = scale;
             rec.h = scale;
 
-            SDL_FillRect(surface, &rec, colour_palette[colour]);
+            SDL_FillRect(surface, &rec, colour_palette[get_lcd_context()->current_color_scheme][colour]);
         }
     }
 }
@@ -102,7 +106,7 @@ void updateDebugWindow()
 {
     int x_draw = 0;
     int y_draw = 0;
-    int title_num = 0;
+    int tile_num = 0;
 
     SDL_Rect rec;
     rec.x = 0;
@@ -113,14 +117,13 @@ void updateDebugWindow()
 
     u16 address = 0x8000;
 
-    // 384 tiles, 24x16
     for (int y = 0; y < 24; y++)
     {
         for (int x = 0; x < 16; x++)
         {
-            displayTile(sdlDebugSurface, address, title_num, x_draw + (x * scale), y_draw + (y * scale));
+            displayTile(sdlDebugSurface, address, tile_num, x_draw + (x * scale), y_draw + (y * scale));
             x_draw += (8 * scale);
-            title_num++;
+            tile_num++;
         }
         y_draw += (8 * scale);
         x_draw = 0;
@@ -148,6 +151,39 @@ void interface_update()
             rec.y = line_num * scale;
             rec.w = scale;
             rec.h = scale;
+
+            u32 pixel_value = video_buffer[x + (line_num * X_RES)];
+
+            switch (get_lcd_context()->current_color_scheme)
+            {
+            case 0:
+                get_lcd_context()->bg_colour[0] = 0xFFFFFFFF;
+                get_lcd_context()->bg_colour[1] = 0xFFAAAAAA;
+                get_lcd_context()->bg_colour[2] = 0xFF555555;
+                get_lcd_context()->bg_colour[3] = 0xFF000000;
+                break;
+
+            case 1:
+                get_lcd_context()->bg_colour[0] = 0xFFFFF6D3;
+                get_lcd_context()->bg_colour[1] = 0xFFF9A875;
+                get_lcd_context()->bg_colour[2] = 0xFFEB6B6F;
+                get_lcd_context()->bg_colour[3] = 0xFF7C3F58;
+                break;
+
+            case 2:
+                get_lcd_context()->bg_colour[0] = 0xFFD0D058;
+                get_lcd_context()->bg_colour[1] = 0xFFA0A840;
+                get_lcd_context()->bg_colour[2] = 0xFF708028;
+                get_lcd_context()->bg_colour[3] = 0xFF405010;
+                break;
+
+            case 3:
+                get_lcd_context()->bg_colour[0] = 0xFFCCA66E;
+                get_lcd_context()->bg_colour[1] = 0xFF99683D;
+                get_lcd_context()->bg_colour[2] = 0xFF664930;
+                get_lcd_context()->bg_colour[3] = 0xFF332920;
+                break;
+            }
 
             SDL_FillRect(sdlSurface, &rec, video_buffer[x + (line_num * X_RES)]);
         }
@@ -199,6 +235,13 @@ void interface_on_key(bool pressed, u32 key_code)
     case SDLK_RIGHT:
     case SDLK_d:
         get_joypad_state()->right = pressed;
+        break;
+
+    case SDLK_c:
+        if (pressed)
+        {
+            get_lcd_context()->current_color_scheme = (get_lcd_context()->current_color_scheme + 1) % (sizeof(colour_palette) / sizeof(colour_palette[0]));
+        }
         break;
     }
 }
